@@ -22,25 +22,23 @@ module Validation
       # validate the document, This performs the XSLT transform on the document and then looks for any errors in the 
       # resulting doc, errors show up as failed-assert elements in the result.
       def validate(document)
-           errors = []
-           style = get_schematron_processor
-           #yes actually need to convert to java.io.String to work
-           source = Validators::Schematron.create_source(document.to_s)
-           
-           # process the document
-           result = style.process(source)
-           # create an REXML::Document form the results
-           redoc = REXML::Document.new result
-           # loop over failed assertions 
-           redoc.elements.to_a("//svrl:failed-assert").each do |el|
-            
-             # do something here with the values
-            errors << ContentError.new(:location => el.attributes["location"],
-                                       :error_message => el.elements['svrl:text'].text,
-                                       :validator => name,
-                                       :inspection_type => ::XML_VALIDATION_INSPECTION)
-           end
-           errors
+        errors = []
+        style = get_schematron_processor
+        #yes actually need to convert to java.io.String to work
+        source = Validators::Schematron.create_source(document.to_s)
+
+        # process the document
+        result = style.process(source)
+        # create an REXML::Document form the results
+        redoc = REXML::Document.new result
+        # loop over failed assertions 
+        redoc.elements.to_a("//svrl:failed-assert").each do |el|
+
+         # do something here with the values
+        errors << {:location => el.attributes["location"],
+                   :error_message => el.elements['svrl:text'].text}
+        end
+        errors
       end
         
       # stubbed method needed to obtain validation  stylesheet
@@ -66,7 +64,6 @@ module Validation
         @stylesheet_processor = XslProcessor.new_instance_from_file(stylesheet)      
       end
 
-      
       # get the validation stylesheet returning either the cached instance or creating a new instance
       def get_schematron_processor
         
