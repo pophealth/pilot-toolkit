@@ -7,6 +7,7 @@ module Validation
     
     def self.c32_xml_schema_validator
       @xml_schema_validator ||= XMLSchemaValidator.new('resources/xml_schema/cdar2c32/infrastructure/cda/C32_CDA.xsd')
+      @xml_schema_validator
     end
   end
 end
