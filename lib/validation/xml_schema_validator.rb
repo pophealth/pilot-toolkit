@@ -22,7 +22,7 @@ module Validation
      rescue 
         # this is where we will do something with the error
         
-        errors << $!.message
+        errors << {:error_message => $!.message}
      end
      errors
     end
