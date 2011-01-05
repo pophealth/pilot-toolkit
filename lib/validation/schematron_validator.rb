@@ -1,6 +1,5 @@
 module Validation
   module SchematronValidator
-    require 'java'
     import 'java.io.ByteArrayInputStream'
     import 'java.io.ByteArrayOutputStream'
 
@@ -25,7 +24,7 @@ module Validation
         errors = []
         style = get_schematron_processor
         #yes actually need to convert to java.io.String to work
-        source = Validators::Schematron.create_source(document.to_s)
+        source = Validation::SchematronValidator.create_source(document.to_s)
 
         # process the document
         result = style.process(source)
@@ -50,14 +49,13 @@ module Validation
     
     class UncompiledValidator < BaseValidator
       
-      attr_accessor :schematron_file, :stylesheet, :cache, :name
+      attr_accessor :schematron_file, :stylesheet, :cache
       
       # create a new UnCompiledValidator
       # schematron_file - the base schematron rule set that will be used to create the XSLT stylesheet used to perform the validation
       # stylesheet - this is the stylesheet that will be used on the schematron rules to create the validation stylesheet
       # cache - whether or not to cache the validation stylesheet, if false (default) then it will compute the validation stylesheet each time validate is called
-      def initialize(name, schematron_file, stylesheet, cache=false)
-        @name = name
+      def initialize(schematron_file, stylesheet, cache=false)
         @schematron_file  = schematron_file
         @stylesheet = stylesheet
         @cache = cache       
@@ -86,11 +84,10 @@ module Validation
     # 
     class CompiledValidator < BaseValidator
       
-      attr_accessor :stylesheet, :name
+      attr_accessor :stylesheet
       
       # stylesheet -  the precomputed validation stylesheet used to validate the document
-      def initialize(name, stylesheet)
-        @name = name
+      def initialize(stylesheet)
         @stylesheet = stylesheet
       end
 
