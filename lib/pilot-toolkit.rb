@@ -7,3 +7,9 @@ require 'rexml/document'
 require 'lib/validation/schematron_validator'
 require 'lib/validation/xml_schema_validator'
 require 'lib/validation/validator_registry'
+
+import "javax.swing.JFrame"
+require 'lib/pophealth_jframe'
+
+foo = PophealthJframe.new()
+foo.show
