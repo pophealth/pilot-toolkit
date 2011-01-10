@@ -9,7 +9,12 @@ require 'lib/validation/xml_schema_validator'
 require 'lib/validation/validator_registry'
 
 import "javax.swing.JFrame"
-require 'lib/pophealth_jframe'
 
-foo = PophealthJframe.new()
-foo.show
+import "javax.swing.JPanel"
+require 'lib/pophealth_importer_jframe'
+
+# this listener handles all of the controller logic
+pophealth_listener = PophealthImporterListener.new()
+pophealth_importer_frame = PophealthImporterJframe.new(pophealth_listener)
+pophealth_listener.set_jframe(pophealth_importer_frame)
+pophealth_importer_frame.show
