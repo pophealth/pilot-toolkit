@@ -17,6 +17,7 @@ class PophealthImporterControlPanel < JPanel
     @pophealth_listeners = Vector.new()
 
     @play_button =  JButton.new("Play")
+    @play_button.setEnabled(false)
     @play_button.addActionListener(self)
     @pause_button = JButton.new("Pause")
     @pause_button.setEnabled(false)
@@ -69,6 +70,22 @@ class PophealthImporterControlPanel < JPanel
         end
       end
     end
+  end
+
+  def set_play_mode(play_mode)
+    if play_mode
+      @play_button.setEnabled(false)
+      @pause_button.setEnabled(true)
+      @stop_button.setEnabled(true)
+    else
+      @play_button.setEnabled(true)
+      @pause_button.setEnabled(false)
+      @stop_button.setEnabled(false)
+    end
+  end
+
+  def enable_play
+    @play_button.setEnabled(true)
   end
 
 end

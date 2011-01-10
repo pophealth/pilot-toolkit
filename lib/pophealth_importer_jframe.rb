@@ -31,6 +31,7 @@ class PophealthImporterJframe < JFrame
     @file_list = JList.new()
 
     @control_panel = PophealthImporterControlPanel.new()
+    @control_panel.add_pophealth_importer_listener(pophealth_listener)
     @content_pane.add(@control_panel, BorderLayout::NORTH)
 
     patients = Vector.new()
@@ -53,6 +54,29 @@ class PophealthImporterJframe < JFrame
 
   def get_control_panel
     @control_panel
+  end
+
+  def set_play_mode(play_mode)
+    @pophealth_importer_menu_bar.set_play_mode(play_mode)
+    @control_panel.set_play_mode(play_mode)
+  end
+
+  def enable_play
+    @pophealth_importer_menu_bar.enable_play
+    @control_panel.enable_play
+  end
+
+  def set_patient_directory(patient_directory)
+    @patient_directory = patient_directory
+    @patient_files = patient_directory.listFiles() 
+    patients_files_vector = Vector.new()
+    number_patient_files = @patient_files.length
+    counter = 0
+    while counter < number_patient_files
+      patients_files_vector.add(@patient_files[counter].getName())
+      counter += 1
+    end
+    @file_list.setListData(patients_files_vector)
   end
 
 end

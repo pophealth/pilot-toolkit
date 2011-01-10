@@ -37,8 +37,9 @@ class PophealthImporterMenuBar < JMenuBar
     @quit_menu_item =  JMenuItem.new("Quit")
     @quit_menu_item.addActionListener(self)
 
-    @run_menu_item =   JMenuItem.new("Play")
-    @run_menu_item.addActionListener(self)
+    @play_menu_item =  JMenuItem.new("Play")
+    @play_menu_item.addActionListener(self)
+    @play_menu_item.setEnabled(false)
     @stop_menu_item =  JMenuItem.new("Stop")
     @stop_menu_item.setEnabled(false)
     @stop_menu_item.addActionListener(self)
@@ -69,7 +70,7 @@ class PophealthImporterMenuBar < JMenuBar
     @mode_menu.add(@c32_mode_menu_item)
     @mode_menu.add(@ccr_mode_menu_item)
 
-    @edit_menu.add(@run_menu_item)
+    @edit_menu.add(@play_menu_item)
     @edit_menu.add(@pause_menu_item)
     @edit_menu.add(@stop_menu_item)
     @edit_menu.add(@mode_menu)
@@ -130,6 +131,22 @@ class PophealthImporterMenuBar < JMenuBar
         end
       end
     end
+  end
+
+  def set_play_mode(play_mode)
+    if play_mode
+      @play_menu_item.setEnabled(false)
+      @stop_menu_item.setEnabled(true)
+      @pause_menu_item.setEnabled(true)
+    else
+      @play_menu_item.setEnabled(true)
+      @stop_menu_item.setEnabled(false)
+      @pause_menu_item.setEnabled(false)
+    end
+  end
+
+  def enable_play
+    @play_menu_item.setEnabled(true)
   end
 
 end

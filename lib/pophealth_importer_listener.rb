@@ -1,14 +1,19 @@
 import "java.lang.System"
+import "javax.swing.JMenuItem"
 import "java.io.File"
 import "javax.swing.JFileChooser"
+
+require 'lib/pophealth_importer_thread'
 
 class PophealthImporterListener
 
   def initialize
+    @importer_thread = PophealthImporterThread.new()
+    @importer_thread.start
   end
 
   def play
-    puts "Write logic for playing/running the importer"
+    @importer_thread.set_import_records_flag
   end
 
   def pause
@@ -29,6 +34,8 @@ class PophealthImporterListener
     return_value = file_chooser.showOpenDialog(@jframe);
     if (return_value == JFileChooser::APPROVE_OPTION)
       @import_directory = file_chooser.getSelectedFile()
+      @importer_thread.set_import_directory(@import_directory)
+      @jframe.enable_play
     end
   end
 
@@ -38,6 +45,7 @@ class PophealthImporterListener
 
   def quit
     @jframe.setVisible(false)
+    @importer_thread.shutdown_importer_thread
     System.exit(0)
   end
 
@@ -59,6 +67,7 @@ class PophealthImporterListener
 
   def set_jframe (jframe)
     @jframe = jframe
+    @importer_thread.set_jframe(jframe)
   end
 
 end
