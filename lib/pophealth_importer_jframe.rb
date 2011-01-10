@@ -34,12 +34,7 @@ class PophealthImporterJframe < JFrame
     @control_panel.add_pophealth_importer_listener(pophealth_listener)
     @content_pane.add(@control_panel, BorderLayout::NORTH)
 
-    patients = Vector.new()
-    patients.add("Fred Smith")
-    patients.add("Zelda Smith")
-    patients.add("Stephanie Smith")
-    patients.add("Mindy Smith")
-    @file_list = JList.new(patients)
+    @file_list = JList.new(Vector.new())
     @text_area = JTextArea.new()
     @file_scroll_pane = JScrollPane.new(@file_list)
     @split_pane = JSplitPane.new(JSplitPane::HORIZONTAL_SPLIT,
