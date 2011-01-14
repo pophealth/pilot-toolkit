@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'lib/pilot-toolkit'
+require 'lib/pilot_toolkit'
 
 class ValidatorTest < Test::Unit::TestCase
   
