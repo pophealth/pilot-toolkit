@@ -1,5 +1,4 @@
 import "java.io.BufferedReader"
-import "java.io.File"
 import "java.io.FileInputStream"
 import "java.io.InputStreamReader"
 import "java.util.StringTokenizer"
@@ -44,6 +43,10 @@ class PophealthImportFile
     else
       return "Invalid file format"
     end
+  end
+  
+  def get_file
+    return @import_file
   end
 
 end

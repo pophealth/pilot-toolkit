@@ -17,15 +17,13 @@ class PophealthImporterThread < Thread
           files = @import_directory.listFiles()
           for i in (0..(files.length-1))
             @jframe.select_item(i)
-            @jframe.update_text
-            sleep 1
+            @jframe.update_text_areas
           end
-          sleep 5
           @jframe.set_play_mode(false)
           @import_records = false
         end
       end
-      # polling is set to 1 second
+      # busy polling is set to 1 second
       sleep 1
     end until @shutdown
   end

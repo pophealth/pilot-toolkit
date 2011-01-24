@@ -1,6 +1,5 @@
 import "java.lang.System"
 import "javax.swing.JMenuItem"
-import "java.io.File"
 import "javax.swing.JFileChooser"
 
 require 'lib/pophealth_importer_thread'

@@ -9,11 +9,14 @@ import "javax.swing.JSplitPane"
 import "javax.swing.JTabbedPane"
 import "javax.swing.JTextArea"
 
+require 'lib/pilot_toolkit'
 require 'lib/pophealth_import_file'
+require 'lib/pophealth_importer_control_panel'
 require 'lib/pophealth_importer_list_renderer'
 require 'lib/pophealth_importer_menu_bar'
 require 'lib/pophealth_importer_listener'
-require 'lib/pophealth_importer_control_panel'
+require 'lib/pophealth_importer_listener'
+require 'lib/pophealth_list_selection_listener'
 
 class PophealthImporterJframe < JFrame
 
@@ -22,6 +25,9 @@ class PophealthImporterJframe < JFrame
   def initialize (pophealth_listener)
 
     super("popHealth Continuity of Care XML Importer")
+
+    @schematron_validator = Validation::ValidatorRegistry.c32_schematron_validator
+    @schema_validator = Validation::ValidatorRegistry.c32_xml_schema_validator
 
     # setup children UI components
     @pophealth_importer_menu_bar = PophealthImporterMenuBar.new()
@@ -40,14 +46,17 @@ class PophealthImporterJframe < JFrame
     @file_content_text_area = JTextArea.new()
     @file_error_text_area = JTextArea.new()
     @file_list.setCellRenderer(PophealthImporterListRenderer.new())
-    @file_list.add_list_selection_listener do |list_selection_event|
-      if @file_list.get_value_is_adjusting
-        @file_content_text_area.set_text(@file_list.get_selected_value.file_content.to_s)
-      end
-    end
+
+    @list_selection_listener = PophealthListSelectionListener.new(self)
+    @file_list.add_list_selection_listener(@list_selection_listener)
+    #@file_list.add_list_selection_listener do |list_selection_event|
+    #  if @file_list.get_value_is_adjusting
+    #    @file_content_text_area.set_text(@file_list.get_selected_value.file_content.to_s)
+    #  end
+    #end
     @file_scroll_pane = JScrollPane.new(@file_list)
     @display_scroll_pane = JScrollPane.new(@file_content_text_area)
-    @error_scroll_pane = JScrollPane.new(@file_error_text_area_list)
+    @error_scroll_pane = JScrollPane.new(@file_error_text_area)
 
     @tabbed_pane = JTabbedPane.new()
     @tabbed_pane.add("File Contents", @display_scroll_pane)
@@ -58,6 +67,7 @@ class PophealthImporterJframe < JFrame
                                  @tabbed_pane)
     @split_pane.setDividerLocation(200)
     @content_pane.add(@split_pane, BorderLayout::CENTER)
+
     getContentPane().add(@content_pane)
     setSize(@@initial_window_dimension)
   end
@@ -84,7 +94,6 @@ class PophealthImporterJframe < JFrame
     counter = 0
     while counter < number_patient_files
       patients_files_vector.add(PophealthImportFile.new(@patient_files[counter]))
-      #patients_files_vector.add(@patient_files[counter].getName())
       counter += 1
     end
     @file_list.setListData(patients_files_vector)
@@ -104,8 +113,31 @@ class PophealthImporterJframe < JFrame
     @control_panel.toggle_pause
   end
 
-  def update_text
+  def update_text_areas
+    if @file_list.get_selected_value.is_valid_format
+      validation_errors = ""
+      c32 = File.read(@file_list.get_selected_value.get_file.get_path)
+      c32_schema_errors= @schema_validator.validate(c32)
+      puts "Number of schema errors is " + c32_schema_errors.length.to_s
+      for i in 1..c32_schema_errors.length
+         puts "Schema error is " + c32_schema_errors[(i-1)].to_s
+         validation_errors += c32_schema_errors[(i-1)].to_s + "\n"
+      end
+      c32_schematron_errors = @schematron_validator.validate(c32)
+      puts "Number of schematron errors is " + c32_schematron_errors.length.to_s
+      for j in 1..c32_schema_errors.length
+        puts "Schematron error is " + c32_schematron_errors[(j-1)].to_s
+        validation_errors += c32_schematron_errors[(j-1)].to_s + "\n"
+      end
+      @file_error_text_area.set_text(validation_errors)
+    else
+      @file_error_text_area.set_text("")
+    end
     @file_content_text_area.set_text(@file_list.get_selected_value.file_content.to_s)
+  end
+
+  def get_file_list
+    return @file_list
   end
 
 end
