@@ -17,7 +17,7 @@ class PophealthImporterListener
   end
 
   def pause
-    puts "Write logic for pausing the importer here"
+    puts "Write logic for pausing"
   end
 
   def stop

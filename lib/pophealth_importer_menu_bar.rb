@@ -149,4 +149,14 @@ class PophealthImporterMenuBar < JMenuBar
     @play_menu_item.setEnabled(true)
   end
 
+  def toggle_pause
+    if @pause_menu_item.isEnabled()
+      @pause_menu_item.setEnabled(false)
+      @play_menu_item.setEnabled(true)
+    else
+      @pause_menu_item.setEnabled(true)
+      @play_menu_item.setEnabled(false)
+    end
+  end
+
 end

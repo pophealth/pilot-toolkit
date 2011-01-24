@@ -88,4 +88,14 @@ class PophealthImporterControlPanel < JPanel
     @play_button.setEnabled(true)
   end
 
+  def toggle_pause
+    if @pause_button.isEnabled()
+      @pause_button.setEnabled(false)
+      @play_button.setEnabled(true)
+    else
+      @pause_button.setEnabled(true)
+      @play_button.setEnabled(false)
+    end
+  end
+
 end

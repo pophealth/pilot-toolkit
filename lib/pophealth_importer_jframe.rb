@@ -6,8 +6,11 @@ import "javax.swing.JList"
 import "javax.swing.JPanel"
 import "javax.swing.JScrollPane"
 import "javax.swing.JSplitPane"
+import "javax.swing.JTabbedPane"
 import "javax.swing.JTextArea"
 
+require 'lib/pophealth_import_file'
+require 'lib/pophealth_importer_list_renderer'
 require 'lib/pophealth_importer_menu_bar'
 require 'lib/pophealth_importer_listener'
 require 'lib/pophealth_importer_control_panel'
@@ -28,21 +31,33 @@ class PophealthImporterJframe < JFrame
     setJMenuBar(@pophealth_importer_menu_bar)
     @content_pane = JPanel.new()
     @content_pane.setLayout(BorderLayout.new())
-    @file_list = JList.new()
 
     @control_panel = PophealthImporterControlPanel.new()
     @control_panel.add_pophealth_importer_listener(pophealth_listener)
-    @content_pane.add(@control_panel, BorderLayout::NORTH)
+    @content_pane.add(@control_panel, BorderLayout::SOUTH)
 
     @file_list = JList.new(Vector.new())
-    @text_area = JTextArea.new()
+    @file_content_text_area = JTextArea.new()
+    @file_error_text_area = JTextArea.new()
+    @file_list.setCellRenderer(PophealthImporterListRenderer.new())
+    @file_list.add_list_selection_listener do |list_selection_event|
+      if @file_list.get_value_is_adjusting
+        @file_content_text_area.set_text(@file_list.get_selected_value.file_content.to_s)
+      end
+    end
     @file_scroll_pane = JScrollPane.new(@file_list)
+    @display_scroll_pane = JScrollPane.new(@file_content_text_area)
+    @error_scroll_pane = JScrollPane.new(@file_error_text_area_list)
+
+    @tabbed_pane = JTabbedPane.new()
+    @tabbed_pane.add("File Contents", @display_scroll_pane)
+    @tabbed_pane.add("Errors/Warnings", @error_scroll_pane)
+
     @split_pane = JSplitPane.new(JSplitPane::HORIZONTAL_SPLIT,
                                  @file_scroll_pane,
-                                 @text_area)
+                                 @tabbed_pane)
     @split_pane.setDividerLocation(200)
     @content_pane.add(@split_pane, BorderLayout::CENTER)
-
     getContentPane().add(@content_pane)
     setSize(@@initial_window_dimension)
   end
@@ -68,10 +83,29 @@ class PophealthImporterJframe < JFrame
     number_patient_files = @patient_files.length
     counter = 0
     while counter < number_patient_files
-      patients_files_vector.add(@patient_files[counter].getName())
+      patients_files_vector.add(PophealthImportFile.new(@patient_files[counter]))
+      #patients_files_vector.add(@patient_files[counter].getName())
       counter += 1
     end
     @file_list.setListData(patients_files_vector)
+  end
+
+  def select_item(index)
+    clear_selection
+    @file_list.addSelectionInterval(index, index)
+  end
+
+  def clear_selection
+    @file_list.clearSelection
+  end
+
+  def toggle_pause
+    @pophealth_importer_menu_bar.toggle_pause
+    @control_panel.toggle_pause
+  end
+
+  def update_text
+    @file_content_text_area.set_text(@file_list.get_selected_value.file_content.to_s)
   end
 
 end
