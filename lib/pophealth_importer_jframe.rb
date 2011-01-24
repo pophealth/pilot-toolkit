@@ -49,11 +49,7 @@ class PophealthImporterJframe < JFrame
 
     @list_selection_listener = PophealthListSelectionListener.new(self)
     @file_list.add_list_selection_listener(@list_selection_listener)
-    #@file_list.add_list_selection_listener do |list_selection_event|
-    #  if @file_list.get_value_is_adjusting
-    #    @file_content_text_area.set_text(@file_list.get_selected_value.file_content.to_s)
-    #  end
-    #end
+
     @file_scroll_pane = JScrollPane.new(@file_list)
     @display_scroll_pane = JScrollPane.new(@file_content_text_area)
     @error_scroll_pane = JScrollPane.new(@file_error_text_area)
@@ -118,15 +114,11 @@ class PophealthImporterJframe < JFrame
       validation_errors = ""
       c32 = File.read(@file_list.get_selected_value.get_file.get_path)
       c32_schema_errors= @schema_validator.validate(c32)
-      puts "Number of schema errors is " + c32_schema_errors.length.to_s
       for i in 1..c32_schema_errors.length
-         puts "Schema error is " + c32_schema_errors[(i-1)].to_s
          validation_errors += c32_schema_errors[(i-1)].to_s + "\n"
       end
       c32_schematron_errors = @schematron_validator.validate(c32)
-      puts "Number of schematron errors is " + c32_schematron_errors.length.to_s
       for j in 1..c32_schema_errors.length
-        puts "Schematron error is " + c32_schematron_errors[(j-1)].to_s
         validation_errors += c32_schematron_errors[(j-1)].to_s + "\n"
       end
       @file_error_text_area.set_text(validation_errors)
