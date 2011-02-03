@@ -114,13 +114,11 @@ class PophealthImporterJframe < JFrame
       validation_errors = ""
       c32 = File.read(@file_list.get_selected_value.get_file.get_path)
       c32_schema_errors= @schema_validator.validate(c32)
-      for i in 1..c32_schema_errors.length
-         validation_errors += c32_schema_errors[(i-1)].to_s + "\n"
-      end
+      validation_errors += c32_schema_errors.join("\n")
+      
       c32_schematron_errors = @schematron_validator.validate(c32)
-      for j in 1..c32_schema_errors.length
-        validation_errors += c32_schematron_errors[(j-1)].to_s + "\n"
-      end
+      validation_errors += c32_schematron_errors.join("\n")
+      
       @file_error_text_area.set_text(validation_errors)
     else
       @file_error_text_area.set_text("")
