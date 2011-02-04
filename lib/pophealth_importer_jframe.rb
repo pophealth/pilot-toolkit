@@ -115,14 +115,11 @@ class PophealthImporterJframe < JFrame
       c32 = File.read(@file_list.get_selected_value.get_file.get_path)
       c32_schema_errors= @schema_validator.validate(c32)
       validation_errors += c32_schema_errors.join("\n")
-      
       c32_schematron_errors = @schematron_validator.validate(c32)
       validation_errors += c32_schematron_errors.join("\n")
-      
       @file_error_text_area.set_text(validation_errors)
-      
       if c32_schematron_errors.empty? && c32_schema_errors.empty?
-        response = Communication::Uploader.upload("http://localhost:3000/records/create_from_c32", 
+        response = Communication::Uploader.upload("http://localhost:3000/records/create_from_c32",
                                                   @file_list.get_selected_value.get_file.get_path)
         @file_error_text_area.set_text(response.body)
       end
