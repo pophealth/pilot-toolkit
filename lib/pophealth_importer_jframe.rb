@@ -1,6 +1,7 @@
 import "java.awt.BorderLayout"
 import "java.awt.Dimension"
 import "java.util.Vector"
+import "javax.swing.ImageIcon"
 import "javax.swing.JFrame"
 import "javax.swing.JList"
 import "javax.swing.JPanel"
@@ -15,12 +16,12 @@ require 'lib/pophealth_importer_control_panel'
 require 'lib/pophealth_importer_list_renderer'
 require 'lib/pophealth_importer_menu_bar'
 require 'lib/pophealth_importer_listener'
-require 'lib/pophealth_importer_listener'
 require 'lib/pophealth_list_selection_listener'
+require 'lib/pophealth_summary_panel'
 
 class PophealthImporterJframe < JFrame
 
-  @@initial_window_dimension = Dimension.new(700, 500)
+  @@initial_window_dimension = Dimension.new(950, 750)
 
   def initialize (pophealth_listener)
 
@@ -43,6 +44,7 @@ class PophealthImporterJframe < JFrame
     @content_pane.add(@control_panel, BorderLayout::SOUTH)
 
     @file_list = JList.new(Vector.new())
+    @summary_text_area = PophealthSummaryPanel.new()
     @file_content_text_area = JTextArea.new()
     @file_error_text_area = JTextArea.new()
     @file_list.setCellRenderer(PophealthImporterListRenderer.new())
@@ -51,10 +53,12 @@ class PophealthImporterJframe < JFrame
     @file_list.add_list_selection_listener(@list_selection_listener)
 
     @file_scroll_pane = JScrollPane.new(@file_list)
+    @summary_scroll_pane = JScrollPane.new(@summary_text_area)
     @display_scroll_pane = JScrollPane.new(@file_content_text_area)
     @error_scroll_pane = JScrollPane.new(@file_error_text_area)
 
     @tabbed_pane = JTabbedPane.new()
+    @tabbed_pane.add("Summary Report", @summary_scroll_pane)
     @tabbed_pane.add("File Contents", @display_scroll_pane)
     @tabbed_pane.add("Errors/Warnings", @error_scroll_pane)
 
@@ -84,7 +88,7 @@ class PophealthImporterJframe < JFrame
 
   def set_patient_directory(patient_directory)
     @patient_directory = patient_directory
-    @patient_files = patient_directory.listFiles() 
+    @patient_files = patient_directory.listFiles()
     patients_files_vector = Vector.new()
     number_patient_files = @patient_files.length
     counter = 0
@@ -104,11 +108,6 @@ class PophealthImporterJframe < JFrame
     @file_list.clearSelection
   end
 
-  def toggle_pause
-    @pophealth_importer_menu_bar.toggle_pause
-    @control_panel.toggle_pause
-  end
-
   def update_text_areas
     if @file_list.get_selected_value.is_valid_format
       validation_errors = ""
@@ -118,14 +117,9 @@ class PophealthImporterJframe < JFrame
       c32_schematron_errors = @schematron_validator.validate(c32)
       validation_errors += c32_schematron_errors.join("\n")
       @file_error_text_area.set_text(validation_errors)
-
-      # Having lots of difficulty getting even test data to be fully valid, so this 
-      # filter is temporarily being disabled
-      #if c32_schematron_errors.empty? && c32_schema_errors.empty?
-        response = Communication::Uploader.upload("http://localhost:3000/records/create_from_c32",
-                                                  @file_list.get_selected_value.get_file.get_path)
-        @file_error_text_area.set_text(response.body)
-      #end
+      response = Communication::Uploader.upload("http://localhost:3000/records/create_from_c32",
+                                                @file_list.get_selected_value.get_file.get_path)
+      @file_error_text_area.set_text(response.body)
     else
       @file_error_text_area.set_text("")
     end

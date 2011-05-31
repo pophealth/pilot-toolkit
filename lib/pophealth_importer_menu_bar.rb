@@ -26,8 +26,6 @@ class PophealthImporterMenuBar < JMenuBar
 
     # ...and then menu items, while configuring them to
     # callback to this menubar when a user clicks on them
-    @new_menu_item =   JMenuItem.new("New")
-    @new_menu_item.addActionListener(self)
     @open_menu_item =  JMenuItem.new("Open")
     @open_menu_item.addActionListener(self)
     @save_menu_item =  JMenuItem.new("Save")
@@ -43,9 +41,6 @@ class PophealthImporterMenuBar < JMenuBar
     @stop_menu_item =  JMenuItem.new("Stop")
     @stop_menu_item.setEnabled(false)
     @stop_menu_item.addActionListener(self)
-    @pause_menu_item = JMenuItem.new("Pause")
-    @pause_menu_item.setEnabled(false)
-    @pause_menu_item.addActionListener(self)
 
     @c32_mode_menu_item = JCheckBoxMenuItem.new("C32", true)
     @c32_mode_menu_item.addActionListener(self)
@@ -61,7 +56,6 @@ class PophealthImporterMenuBar < JMenuBar
     @about_menu_item.addActionListener(self)
 
     # Configure the menus with menu items
-    @file_menu.add(@new_menu_item)
     @file_menu.add(@open_menu_item)
     @file_menu.add(@save_menu_item)
     @file_menu.addSeparator()
@@ -71,7 +65,6 @@ class PophealthImporterMenuBar < JMenuBar
     @mode_menu.add(@ccr_mode_menu_item)
 
     @edit_menu.add(@play_menu_item)
-    @edit_menu.add(@pause_menu_item)
     @edit_menu.add(@stop_menu_item)
     @edit_menu.add(@mode_menu)
 
@@ -117,12 +110,10 @@ class PophealthImporterMenuBar < JMenuBar
     @pophealth_listeners.synchronized do
       @pophealth_listeners.each do |registered_listener|
         case e.getActionCommand()
-          when "New"   : registered_listener.new_import
           when "Open"  : registered_listener.open
           when "Save"  : registered_listener.save_import_results
           when "Quit"  : registered_listener.quit
           when "Play"  : registered_listener.play
-          when "Pause" : registered_listener.pause
           when "Stop"  : registered_listener.stop
           when "C32"   : registered_listener.switch_to_c32_mode
           when "CCR"   : registered_listener.switch_to_ccr_mode
@@ -137,26 +128,14 @@ class PophealthImporterMenuBar < JMenuBar
     if play_mode
       @play_menu_item.setEnabled(false)
       @stop_menu_item.setEnabled(true)
-      @pause_menu_item.setEnabled(true)
     else
       @play_menu_item.setEnabled(true)
       @stop_menu_item.setEnabled(false)
-      @pause_menu_item.setEnabled(false)
     end
   end
 
   def enable_play
     @play_menu_item.setEnabled(true)
-  end
-
-  def toggle_pause
-    if @pause_menu_item.isEnabled()
-      @pause_menu_item.setEnabled(false)
-      @play_menu_item.setEnabled(true)
-    else
-      @pause_menu_item.setEnabled(true)
-      @play_menu_item.setEnabled(false)
-    end
   end
 
 end
