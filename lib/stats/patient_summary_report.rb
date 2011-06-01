@@ -9,22 +9,6 @@ module Stats
     attr_accessor :allergies, :care_goals, :conditions, :encounters, :immunizations, :medical_equipment,
                   :medications, :procedures, :results, :social_history, :vital_signs
 
-<<<<<<< HEAD
-    # Each section is initialized with the appropriate meaningful use (MU) coding systems
-    def initialize
-        # Initialize the sections of the Patient Summary
-        @allergies = PatientSummarySection.new(["RxNorm","SNOMEDCT"])
-        @care_goals = PatientSummarySection.new(["SNOMEDCT"])
-        @conditions = PatientSummarySection.new(["SNOMEDCT", "ICD9", "ICD10"])
-        @encounters = PatientSummarySection.new(["CPT"])
-        @immunizations = PatientSummarySection.new(["RxNorm","CVX"])
-        @medical_equipment = PatientSummarySection.new( ["SNOMEDCT"])
-        @medications = PatientSummarySection.new( ["RxNorm","CVX"])
-        @procedures = PatientSummarySection.new(["CPT","ICD9","ICD10","HCPCS"])
-        @results = PatientSummarySection.new( ["LOINC","SNOMEDCT"])
-        @social_history = PatientSummarySection.new( ["SNOMEDCT"])
-        @vital_signs = PatientSummarySection.new( ["ICD9","ICD10","SNOMEDCT"])
-=======
     @mu_code_sets = {}
     @mu_code_sets[:allergies] = ["RxNorm","SNOMEDCT"]
     @mu_code_sets[:care_goals] = ["SNOMEDCT"]
@@ -49,7 +33,6 @@ module Stats
       end
 
       psr
->>>>>>> a8064b05f0724cafc76417063faf3565a9892fef
     end
 
   end
