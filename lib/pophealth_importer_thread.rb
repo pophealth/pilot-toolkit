@@ -4,7 +4,6 @@ class PophealthImporterThread < Thread
 
   def initialize
     @shutdown = false
-    @pause = false
     @import_records = false
   end
 

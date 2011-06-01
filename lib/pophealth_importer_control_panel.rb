@@ -19,16 +19,12 @@ class PophealthImporterControlPanel < JPanel
     @play_button =  JButton.new("Play")
     @play_button.setEnabled(false)
     @play_button.addActionListener(self)
-    @pause_button = JButton.new("Pause")
-    @pause_button.setEnabled(false)
-    @pause_button.addActionListener(self)
     @stop_button =  JButton.new("Stop")
     @stop_button.setEnabled(false)
     @stop_button.addActionListener(self)
 
     self.setLayout(FlowLayout.new())
     self.add(@play_button)
-    self.add(@pause_button)
     self.add(@stop_button)
   end
 
@@ -65,7 +61,6 @@ class PophealthImporterControlPanel < JPanel
       @pophealth_listeners.each do |registered_listener|
         case e.getActionCommand()
           when "Play"   : registered_listener.play
-          when "Pause"  : registered_listener.pause
           when "Stop"   : registered_listener.stop
         end
       end
@@ -75,27 +70,15 @@ class PophealthImporterControlPanel < JPanel
   def set_play_mode(play_mode)
     if play_mode
       @play_button.setEnabled(false)
-      @pause_button.setEnabled(true)
       @stop_button.setEnabled(true)
     else
       @play_button.setEnabled(true)
-      @pause_button.setEnabled(false)
       @stop_button.setEnabled(false)
     end
   end
 
   def enable_play
     @play_button.setEnabled(true)
-  end
-
-  def toggle_pause
-    if @pause_button.isEnabled()
-      @pause_button.setEnabled(false)
-      @play_button.setEnabled(true)
-    else
-      @pause_button.setEnabled(true)
-      @play_button.setEnabled(false)
-    end
   end
 
 end
