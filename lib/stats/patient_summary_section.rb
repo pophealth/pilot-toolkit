@@ -1,5 +1,7 @@
 module Stats
   class PatientSummarySection
+    attr_reader :entries
+    
     def initialize(mu_code_systems)
       @num_coded_entries = 0
       @num_uncoded_entries = 0
