@@ -1,7 +1,3 @@
-require 'quality-measure-engine'
-require 'patient_summary_section'
-
-
 module Stats
   # PatientSummaryReport is used to capture an assesment of coded values within both the HITSP C32 and ASTM CCR documents that are to be input 
   # to popHealth
