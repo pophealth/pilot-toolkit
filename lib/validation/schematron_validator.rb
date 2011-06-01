@@ -28,13 +28,14 @@ module Validation
         # process the document
         result = style.process(source)
         # create an REXML::Document form the results
-        redoc = REXML::Document.new result
+        nokodoc = Nokogiri::XML(result)
+        nokodoc.root.add_namespace_definition('svrl', 'http://purl.oclc.org/dsdl/svrl')
         # loop over failed assertions 
-        redoc.elements.to_a("//svrl:failed-assert").each do |el|
+        nokodoc.xpath("//svrl:failed-assert").each do |el|
 
          # do something here with the values
-        errors << {:location => el.attributes["location"],
-                   :error_message => el.elements['svrl:text'].text}
+        errors << {:location => el["location"],
+                   :error_message => el.at_xpath('svrl:text').text}
         end
         errors
       end
