@@ -3,12 +3,16 @@ require 'java'
 java.lang.System.setProperty("javax.xml.transform.TransformerFactory","net.sf.saxon.TransformerFactoryImpl")
 java.lang.System.setProperty("javax.xml.parsers.DocumentBuilderFactory","net.sf.saxon.dom.DocumentBuilderFactoryImpl")
 
+Bundler.require(:default)
+
 require 'rexml/document'
 require 'uri'
 require 'net/http'
 
-require 'lib/validation/schematron_validator'
-require 'lib/validation/xml_schema_validator'
-require 'lib/validation/validator_registry'
-
-require 'lib/communication/uploader'
+require_relative 'validation/schematron_validator'
+require_relative 'validation/xml_schema_validator'
+require_relative 'validation/validator_registry'
+                  
+require_relative 'communication/uploader'
+require_relative 'stats/patient_summary_section'
+require_relative 'stats/patient_summary_report'

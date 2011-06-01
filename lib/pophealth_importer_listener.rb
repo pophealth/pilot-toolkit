@@ -6,6 +6,12 @@ require 'lib/pophealth_importer_thread'
 
 class PophealthImporterListener
 
+  @@continuity_of_care_mode = :c32_mode
+
+  def self.continuity_of_care_mode
+    @@continuity_of_care_mode
+  end
+
   def initialize
     @importer_thread = PophealthImporterThread.new()
     @importer_thread.start
@@ -15,16 +21,8 @@ class PophealthImporterListener
     @importer_thread.set_import_records_flag
   end
 
-  def pause
-    puts "Write logic for pausing"
-  end
-
   def stop
     puts "Write logic for stopping"
-  end
-
-  def new_import
-    puts "Write logic for starting a new import here"
   end
 
   def open
@@ -49,19 +47,15 @@ class PophealthImporterListener
   end
 
   def switch_to_c32_mode
-    puts "Write logic for switching to C32 mode here"
+    @@continuity_of_care_mode = :c32_mode
   end
 
   def switch_to_ccr_mode
-    puts "Write logic for switching to CCR mode here"
-  end
-
-  def help
-    puts "Write logic for... oh hell, who are we kidding... we're not going to ever do this"
+    @@continuity_of_care_mode = :ccr_mode
   end
 
   def about
-    puts "Open web browser to popHealth website"
+    system("open", "http://projectpophealth.org/")
   end
 
   def set_jframe (jframe)

@@ -7,8 +7,9 @@ require 'quality-measure-engine'
 module Stats
   class PatientSummarySection
     attr_accessor :mu_coded_entries, :alien_coded_entries, :uncoded_entries
-
+    attr_reader :entries
 #  Initializing a PatientSummarySection requires an array of valid MU code systems for entries to be recorded
+
     def initialize(mu_code_systems)
       @mu_code_systems_found = {}
       @alien_code_systems_found = {}
