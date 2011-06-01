@@ -16,6 +16,7 @@ module Stats
       @mu_coded_entries = []
       @alien_coded_entries = []
       @mu_code_systems = mu_code_systems
+
    STDERR.puts "GORK #{mu_code_systems}"
     end
     
@@ -45,7 +46,7 @@ module Stats
     end
 #
     def add_entry(entry)
-        STDERR.puts "codes = #{entry.codes.size}"
+        STDERR.puts "add_entry -- codes = #{entry.codes.size}"
       mu_code_found = false;
 
       if (entry.codes.size  > 0)
