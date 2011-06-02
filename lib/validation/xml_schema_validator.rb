@@ -1,16 +1,18 @@
 module Validation
+
   class XMLSchemaValidator
+
     import 'javax.xml.validation.SchemaFactory'
     import 'javax.xml.XMLConstants'
     import 'javax.xml.transform.stream.StreamSource'
     import 'javax.xml.parsers.DocumentBuilder'
     import 'javax.xml.parsers.DocumentBuilderFactory'
     import 'java.io.ByteArrayInputStream'
-    
+
     def initialize(schema_file)
       set_schema(schema_file)
     end
-    
+
     # Validate the document against the configured schema
     def validate(document)
       errors = []
@@ -21,14 +23,13 @@ module Validation
         validator.validate(source);
      rescue 
         # this is where we will do something with the error
-        
         errors << {:error_message => $!.message}
      end
      errors
     end
-    
-    
+
     private 
+
     # set the schema file and create the java objects to perfrom the validation
     def set_schema(file)
       factory = javax.xml.validation.SchemaFactory.newInstance(javax.xml.XMLConstants::W3C_XML_SCHEMA_NS_URI)
@@ -40,4 +41,5 @@ module Validation
     end
 
   end
+
 end

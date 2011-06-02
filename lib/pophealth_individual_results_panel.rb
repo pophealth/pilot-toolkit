@@ -10,7 +10,7 @@ require 'lib/pophealth_bar_chart'
 
 class PophealthIndividualResultsPanel < JPanel
 
-  def initialize(display_name, percentage, display_numeric_visualization)
+  def initialize(display_name, display_numeric_visualization)
     super()
     self.setLayout(BorderLayout.new(10, 10))
     self.setPreferredSize(Dimension.new(500, 35))
@@ -30,19 +30,26 @@ class PophealthIndividualResultsPanel < JPanel
     if display_numeric_visualization
       center_panel = JPanel.new()
       center_panel.setLayout(BorderLayout.new(10, 10))
-      bar_chart = PophealthBarChart.new()
-      bar_chart.set_percentage(percentage)
-      self.add(bar_chart, BorderLayout::CENTER)
+      @bar_chart = PophealthBarChart.new()
+      self.add(@bar_chart, BorderLayout::CENTER)
       percentage_panel = JPanel.new()
       percentage_panel.setLayout(BorderLayout.new(10, 10))
-      percentage = percentage * 100
-      percentage_label = JLabel.new(percentage.to_s + "% ")
-      if percentage == 0.0
-        percentage_label.setForeground(Color::RED)
-        percentage_label.setFont(Font.new(percentage_label.getFont().getName(), Font::BOLD, percentage_label.getFont().getSize()))
-      end
-      percentage_panel.add(percentage_label, BorderLayout::CENTER)
+      @percentage_label = JLabel.new("")
+      percentage_panel.add(@percentage_label, BorderLayout::CENTER)
       self.add(percentage_panel, BorderLayout::EAST)
+    end
+  end
+
+  def set_percentage(percentage)
+    @bar_chart.set_percentage(percentage)
+    percentage = percentage * 100
+    @percentage_label.setText(percentage.truncate.to_s + "% ")
+    if percentage == 0.0
+      @percentage_label.setForeground(Color::RED)
+      @percentage_label.setFont(Font.new(@percentage_label.getFont().getName(), Font::BOLD, @percentage_label.getFont().getSize()))
+    else
+      @percentage_label.setForeground(Color::BLACK)
+      @percentage_label.setFont(Font.new(@percentage_label.getFont().getName(), Font::PLAIN, @percentage_label.getFont().getSize()))
     end
   end
 

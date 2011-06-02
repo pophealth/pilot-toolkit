@@ -1,4 +1,5 @@
 import "java.awt.BorderLayout"
+import "java.awt.FlowLayout"
 import "java.awt.Dimension"
 import "java.util.Vector"
 import "javax.swing.ImageIcon"
@@ -66,7 +67,19 @@ class PophealthImporterJframe < JFrame
                                  @file_scroll_pane,
                                  @tabbed_pane)
     @split_pane.setDividerLocation(200)
+
+    @progress_bar = JProgressBar.new(0, 100)
+    @progress_bar.set_value 0
+    @progress_bar.set_string_painted false
+    @progress_bar.set_border_painted true
+    @progress_bar.set_preferred_size(Dimension.new(700, 20))
+    progress_panel = JPanel.new()
+    progress_panel.setLayout(FlowLayout.new())
+    progress_panel.add(JLabel.new("  XML File Analysis:"))
+    progress_panel.add(@progress_bar)
+
     @content_pane.add(@split_pane, BorderLayout::CENTER)
+    @content_pane.add(progress_panel, BorderLayout::SOUTH)
 
     getContentPane().add(@content_pane)
     setSize(@@initial_window_dimension)
@@ -117,9 +130,6 @@ class PophealthImporterJframe < JFrame
       c32_schematron_errors = @schematron_validator.validate(c32)
       validation_errors += c32_schematron_errors.join("\n")
       @file_error_text_area.set_text(validation_errors)
-      response = Communication::Uploader.upload("http://localhost:3000/records/create_from_c32",
-                                                @file_list.get_selected_value.get_file.get_path)
-      @file_error_text_area.set_text(response.body)
     else
       @file_error_text_area.set_text("")
     end
@@ -128,6 +138,14 @@ class PophealthImporterJframe < JFrame
 
   def get_file_list
     return @file_list
+  end
+
+  def update_analysis_results (analysis_results)
+    @summary_text_area.update_analysis_results(analysis_results)
+  end
+
+  def set_analysis_progress_bar(progress)
+    @progress_bar.set_value((progress*100.0).truncate)
   end
 
 end
