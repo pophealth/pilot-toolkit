@@ -4,6 +4,7 @@
 require 'quality-measure-engine'
 require 'patient_summary_report'
 require 'nokogiri'
+require 'json'
 
 
 $coded_values = {}
@@ -13,33 +14,39 @@ module CCRscan
  class CCR
 
 # initialize -- open the XML file and parse
-    def initialize(ccrFilePath, summaryFilePath)
-        @ccrFilePath = ccrFilePath
-        @summaryFilePath = summaryFilePath
-        STDERR.puts "initialize:  ccrFilePath = #{@ccrFilePath}"
-        @doc = Nokogiri::XML(File.open(@ccrFilePath) ) 
-#        @doc.remove_namespaces!()
-        @summaryfp = File.open(@summaryFilePath,"w")
-        @summary = {}
-        @patientSummaryReport = Stats::PatientSummaryReport.new
+    def initialize()
+        @ccr_hash = {}
+        @sections = { :conditions  => "//Problems/Problem",
+                      :encounters =>  "//Encounters/Encounter",
+                      :medications => "//Medications/Medication",    #special handling for productName, brandName
+                      :allergies   => "//Alerts/Alert",              #special handling for Description
+                      :procedures => "//Procedures/Procedure",
+                      :vital_signs => "//VitalSigns/Result",            #special handling for ./Test/Description
+                      :results     => "//Results/Result",                #special handling for ./test...same as for vital_signs
+                      :care_goals => "//Goals/Goal",
+                      :social_history => "//SocialHistory/SocialHistoryElement",
+                      :medical_equipment => "//MedicalEquipment/Equipment"
+       }
     end
 
-#  process does all the heavy lifting
-#    - adds any uncoded values discovered to the (global) uncoded_values_hash
-#    - returns a hash with stats on coding
-    def process(uncoded_values_hash)
-         @uncoded = uncoded_values_hash
+    def create_ccr_hash(doc)
+        @doc = doc
 
-#        uncoded_encounters = find_uncoded_encounters()
-#        uncoded_products = find_uncoded_products()
-        uncoded_problems = find_uncoded_problems()
-        uncoded_vital_results = find_uncoded_results("VitalSigns")
-        uncoded_test_results = find_uncoded_results("Results")
-#        uncoded_alerts = find_uncoded_alerts()
-    @summaryfp.puts JSON.pretty_generate(@summary)
-    @summaryfp.close
+        process_section(:conditions ) #-> problems
+        process_section(:encounters) #-> encounters
+        process_section(:procedures) #-> procedures
+        process_section(:care_goals) #-> care_goals ...is there such a section?
+        process_section(:social_history) # -> social_history
+        process_section(:medical_equipment) #-> medial_equipment...is there such a section
+        process_section(:allergies) #-> alerts...is there such a section
+        process_vital_signs (:vital_signs)  #-> vital_signs
+        process_vital_signs (:results)  #-> results
+        process_medications(:medications)#-> medications
 
-    end
+      return @ccr_hash
+     end
+
+
 
 #
 ## normalize_coding_system attempts to simplify analysis of the XML doc by normalizing the names of the coding systems
@@ -54,9 +61,9 @@ module CCRscan
              "cpt-4" => "CPT",
              "snomedct" => "SNOMEDCT",
              "snomed-ct" => "SNOMEDCT",
-             "rxnorm" => "Rxnorm",
-             "icd9-cm" => "ICD9",
-             "icd9" => "ICD9"
+             "rxnorm" => "RxNorm",
+             "icd9-cm" => "ICD-9-CM",
+             "icd9" => "ICD-9-CM"
         }
         codingsystem = lookup[code.xpath('./CodingSystem')[0].content.downcase]
         if(codingsystem)
@@ -64,63 +71,100 @@ module CCRscan
         end
     end
 
-def find_uncoded_problems()
-     problems = @doc.xpath("//Problem")
-     STDERR.puts "Problems: #{problems.size}" 
-    problems.each do | problem | 
-        entry = QME::Importer::Entry.new
-         codes = problem.xpath("./Description/Code")
-        desctext = problem.xpath("./Description/Text")[0].content
+def process_codes(node,entry)
+
+        codes = node.xpath("./Description/Code")
+#        STDERR.puts "codes.size = #{codes.size}"
+        desctext = node.xpath("./Description/Text")[0].content
+        entry.description = desctext
         if codes.size > 0 
               found_code = true
               codes.each do | code | 
               normalize_coding_system(code)
               codetext = code.xpath("./CodingSystem")[0].content
-              entry.add_code(codetext, code.xpath("./Value")[0].content)
+              entry.add_code(code.xpath("./Value")[0].content, codetext)
            end
         end
-         @patientSummaryReport.conditions.add_entry(entry)
-      end
-
 end
 
-def find_uncoded_results(type)
-      results = @doc.xpath("//" + type + "/Result")
+def process_product_codes(node,entry)
 
-
-    results.each do | result | 
-         entry = QME::Importer::Entry.new
-         codes = result.xpath("./Description/Code")
-#        STDERR.puts "*Result Code: #{codes}"
-        found_code = false
-        if !codes.empty? 
-            codes.each do | code | 
+        codes = node.xpath("./Code")
+#        STDERR.puts "codes.size = #{codes.size}"
+        if codes.size > 0 
+              found_code = true
+              codes.each do | code | 
               normalize_coding_system(code)
               codetext = code.xpath("./CodingSystem")[0].content
-              entry.add_code(codetext, code.xpath("./Value")[0].content)
+              entry.add_code(code.xpath("./Value")[0].content, codetext)
            end
         end
-        @patientSummaryReport.results.add_entry(entry)
-#
-        test = result.xpath("./Test/Description")
+end
+
+def process_section(section_name)
+     STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
+     entries = @doc.xpath(@sections[section_name])
+     if(entries.size == 0)
+        return
+     end
+
+     @ccr_hash[ section_name] = []
+     entries.each do | e | 
          entry = QME::Importer::Entry.new
-        if !test.empty? 
-        # STDERR.puts "*Test : #{test}"
-         codes = test.xpath("./Code")
-         entry = QME::Importer::Entry.new
-          if !codes.empty?
-             codes.each do | code | 
-               normalize_coding_system(code)
-              codetext = code.xpath("./CodingSystem")[0].content
-              entry.add_code(codetext, code.xpath("./Value")[0].content)
-             end
-          end
-         end
-         @patientSummaryReport.results.add_entry(entry)
-      end
+         process_codes(e,entry)
+         @ccr_hash[ section_name ] << entry
+     end
+
 end
 
 
+def process_vital_signs (section_name)
+     STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
+      results = @doc.xpath(@sections[section_name])
+      if (results.size == 0)
+        return
+      end
+      @ccr_hash[section_name] = []
+      results.each do | result | 
+         entry = QME::Importer::Entry.new
+         process_codes(result, entry)
+
+         test = result.xpath("./Test")
+        STDERR.puts "test.size = #{test.size}"
+         if (test.size > 0 && test.xpath("./Description/Text").size > 0)
+                
+                process_codes(test,entry)   # add them to the entry
+         end
+         @ccr_hash[section_name] << entry 
+      end
+ end
+
+
+def process_medications (section_name)
+     STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
+      meds = @doc.xpath(@sections[section_name])
+      if(meds.size == 0)
+        return
+      end
+        @ccr_hash[section_name] = []
+        #STDERR.puts "meds = #{meds.size}    #{meds}"
+      meds.each do | med | 
+         entry = QME::Importer::Entry.new
+         products = med.xpath("./Product")
+#        STDERR.puts "products = #{products.size} #{products}"
+         products.each do | product |
+             #STDERR.puts product
+             productName = product.xpath("./ProductName")
+             brandName = product.xpath("./BrandName")
+             productNameText = productName.xpath("./Text")[0]
+             brandNameText = brandName.xpath("./Text")[0] 
+             entry.description = productNameText.content
+             process_product_codes(productName, entry)    #we throw any codes found within the productName and brandName into the same entry
+            process_product_codes(brandName, entry)
+         end
+         @ccr_hash[section_name] << entry 
+      end
+ end
 
 end
 
@@ -132,11 +176,22 @@ end
 if __FILE__ == $0
 
   STDERR.puts "GORK"
-  entry = QME::Importer::Entry.new
-  $uncoded = {}
+  ccrFilePath = ARGV[0]
+  doc = Nokogiri::XML(File.open(ccrFilePath) ) 
 
-  doc = CCRscan::CCR.new(ARGV[0], ARGV[1]) 
-  doc.process($uncoded)
+  ccr = CCRscan::CCR.new
+  hash = ccr.create_ccr_hash (doc)
+  hash.each_pair do |section, entries|
+        STDERR.puts "Section #{section} with #{entries.size} entries"
+        entries.each do | entry |
+                STDERR.puts "\tEntry #{entry.description}"
+                entry.codes.each_pair do |codeset, codes|
+                        STDERR.puts "\t\t#{codeset}  #{codes.join(',')}"
+                end
+        end
+  end
+
+
 
 
 end

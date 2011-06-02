@@ -10,17 +10,27 @@ module Stats
     attr_reader :entries
 #  Initializing a PatientSummarySection requires an array of valid MU code systems for entries to be recorded
 
-    def initialize(mu_code_systems)
+    def initialize(name, mu_code_systems)
+      @name = name
       @mu_code_systems_found = {}
       @alien_code_systems_found = {}
       @uncoded_entries = []
       @mu_coded_entries = []
       @alien_coded_entries = []
       @mu_code_systems = mu_code_systems
-
-   STDERR.puts "GORK #{mu_code_systems}"
     end
     
+#
+    def dump(outfp)
+   outfp.puts "Section #{@name}:   mu_code_systems = #{@mu_code_systems.join(',')}"
+   outfp.puts "\tEntries: #{num_coded_entries + num_uncoded_entries}, #{num_coded_entries} coded"
+    if(num_alien_coded_entries > 0)
+        outfp.puts "\taliens: #{num_alien_coded_entries} #{alien_code_systems_found}"
+    end
+    if(num_mu_coded_entries > 0)
+        outfp.puts "\tmu:     #{num_mu_coded_entries}   #{mu_code_systems_found}"  
+    end
+   end
 #
     def num_uncoded_entries
         return uncoded_entries.size
@@ -78,7 +88,7 @@ module Stats
 # if launched as a standalone program, not loaded as a module
 if __FILE__ == $0
 
-   section = Stats::PatientSummarySection.new(["ICD9","ICD10","SNOMEDCT"])
+   section = Stats::PatientSummarySection.new("junk",["ICD9","ICD10","SNOMEDCT"])
    entry = QME::Importer::Entry.new
    entry.add_code(32000, "ICD9")
    entry.add_code(32001,"ICD9")
@@ -86,10 +96,7 @@ if __FILE__ == $0
    entry.add_code(32001,"ICD10")
    entry.add_code(1,"GORK")
    section.add_entry(entry)
-   STDERR.puts "aliens: #{section.num_alien_coded_entries} #{section.alien_code_systems_found}"
-   STDERR.puts "mu:     #{section.num_mu_coded_entries}   #{section.mu_code_systems_found}"   
-   STDERR.puts "uncoded:  #{section.num_uncoded_entries}"
-   STDERR.puts "coded:  #{section.num_coded_entries}"
+   section.dump(STDERR)
 
 
 end
