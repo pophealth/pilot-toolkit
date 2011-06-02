@@ -21,6 +21,19 @@ module Stats
     end
     
 #
+    def summary
+       results = { @name => { "entries" => "#{num_coded_entries + num_uncoded_entries}",
+                             "mu code systems" => @mu_code_systems,
+                             "coded entries" => num_coded_entries,
+                             "mu coded entries" => num_mu_coded_entries,
+                             "mu code systems in use" => mu_code_systems_found,
+                             "non-mu coded entries" =>num_alien_coded_entries,
+                             "non-mu code systems in use" => alien_code_systems_found
+                            }
+                  }
+        return results
+     end
+
     def dump(outfp)
    outfp.puts "Section #{@name}:   mu_code_systems = #{@mu_code_systems.join(',')}"
    outfp.puts "\tEntries: #{num_coded_entries + num_uncoded_entries}, #{num_coded_entries} coded"
@@ -28,7 +41,11 @@ module Stats
         outfp.puts "\taliens: #{num_alien_coded_entries} #{alien_code_systems_found}"
     end
     if(num_mu_coded_entries > 0)
-        outfp.puts "\tmu:     #{num_mu_coded_entries}   #{mu_code_systems_found}"  
+        andaliens = ""
+        if(alien_code_systems_found.size > 0)
+             andaliens = "and #{alien_code_systems_found}"
+        end
+        outfp.puts "\tmu:     #{num_mu_coded_entries}   #{mu_code_systems_found} #{andaliens}"  
     end
    end
 #
@@ -97,6 +114,7 @@ if __FILE__ == $0
    entry.add_code(1,"GORK")
    section.add_entry(entry)
    section.dump(STDERR)
+   STDERR.puts section.summary
 
 
 end

@@ -91,5 +91,43 @@ module Stats
          STDERR.puts "***END DUMP***"
    end
 
+   def summary
+        summary_hash = {}
+         if(@allergies) 
+            summary_hash.merge!(@allergies.summary)
+         end
+         if(@care_goals)
+                summary_hash.merge!(@care_goals.summary)
+         end
+         if(@conditions)
+                summary_hash.merge!(@conditions.summary)
+         end
+         if (@encounters)
+                summary_hash.merge!(@encounters.summary)
+         end
+         if (@immunizatons)
+                summary_hash.merge!(@immunizatons.summary)
+         end
+         if (@medical_equipment)
+                summary_hash.merge!(@medical_equipment.summary)
+         end
+         if (@medications)
+                summary_hash.merge!(@medications.summary)
+         end
+         if (@procedures)
+                summary_hash.merge!(@procedures.summary)
+          end
+        if (@results)
+                summary_hash.merge!(@results.summary)
+         end
+         if (@social_history)
+                summary_hash.merge!(@social_history.summary)
+         end
+         if (@vital_signs)
+                summary_hash.merge!(@vital_signs.summary)
+         end
+      return summary_hash
+
+   end
 end
 end
