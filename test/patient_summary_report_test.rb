@@ -7,5 +7,7 @@ class PatientSummaryReportTest < Test::Unit::TestCase
     doc.root.add_namespace_definition('cda', 'urn:hl7-org:v3')
     psr = Stats::PatientSummaryReport.from_c32(doc)
     assert_equal 1, psr.encounters.entries.size
+    assert_equal 1, psr.encounters.num_coded_entries
+    assert psr.encounters.mu_code_systems_found.include?('CPT')
   end
 end

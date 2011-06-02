@@ -45,8 +45,6 @@ class PophealthImporterMenuBar < JMenuBar
     @c32_mode_menu_item = JCheckBoxMenuItem.new("C32", true)
     @c32_mode_menu_item.addActionListener(self)
     @ccr_mode_menu_item = JCheckBoxMenuItem.new("CCR", false)
-    # TODO: Comment out next line when CCR importer is integrated
-    @ccr_mode_menu_item.setEnabled(false)
     @ccr_mode_menu_item.addActionListener(self)
 
     @help_menu_item =  JMenuItem.new("Help")
@@ -109,16 +107,24 @@ class PophealthImporterMenuBar < JMenuBar
     # always remember thread safety when processing events!
     @pophealth_listeners.synchronized do
       @pophealth_listeners.each do |registered_listener|
-        case e.getActionCommand()
-          when "Open"  : registered_listener.open
-          when "Save"  : registered_listener.save_import_results
-          when "Quit"  : registered_listener.quit
-          when "Play"  : registered_listener.play
-          when "Stop"  : registered_listener.stop
-          when "C32"   : registered_listener.switch_to_c32_mode
-          when "CCR"   : registered_listener.switch_to_ccr_mode
-          when "Help"  : registered_listener.help
-          when "About" : registered_listener.about
+        if (e.getActionCommand() == "Open")
+          registered_listener.open
+        elsif (e.getActionCommand() == "Save")
+          registered_listener.save_import_results
+        elsif (e.getActionCommand() == "Quit")
+          registered_listener.quit
+        elsif (e.getActionCommand() == "Play")
+          registered_listener.play
+        elsif (e.getActionCommand() == "Stop")
+          registered_listener.stop
+        elsif (e.getActionCommand() == "C32")
+          registered_listener.switch_to_c32_mode
+        elsif (e.getActionCommand() == "CCR")
+          registered_listener.switch_to_ccr_mode
+        elsif (e.getActionCommand() == "Help")
+          registered_listener.help
+        elsif (e.getActionCommand() == "About")
+          registered_listener.about
         end
       end
     end

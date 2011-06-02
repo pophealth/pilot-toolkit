@@ -3,7 +3,8 @@ require 'java'
 java.lang.System.setProperty("javax.xml.transform.TransformerFactory","net.sf.saxon.TransformerFactoryImpl")
 java.lang.System.setProperty("javax.xml.parsers.DocumentBuilderFactory","net.sf.saxon.dom.DocumentBuilderFactoryImpl")
 
-Bundler.require(:default)
+require "bundler/setup"
+require 'quality-measure-engine'
 
 require 'rexml/document'
 require 'uri'

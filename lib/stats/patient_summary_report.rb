@@ -1,3 +1,4 @@
+
 require 'quality-measure-engine'
 require 'patient_summary_section'
 require 'ccrscan'
@@ -9,6 +10,7 @@ module Stats
   class PatientSummaryReport
     attr_accessor :allergies, :care_goals, :conditions, :encounters, :immunizations, :medical_equipment,
                   :medications, :procedures, :results, :social_history, :vital_signs
+
 
     # Each section is initialized with the appropriate meaningful use (MU) coding systems
     def initialize
@@ -26,6 +28,7 @@ module Stats
       @@mu_code_sets[:social_history] = ["SNOMEDCT"]
       @@mu_code_sets[:vital_signs] = ["ICD-9-CM","ICD-10-CM","SNOMEDCT"]
    end
+
 
     def self.from_c32(document)
       psr = PatientSummaryReport.new
@@ -48,7 +51,6 @@ module Stats
         entry_list.each {|entry| pss.add_entry(entry)}
         psr.send("#{section}=", pss)
       end
-
       psr
     end
 
@@ -130,4 +132,5 @@ module Stats
 
    end
 end
+
 end

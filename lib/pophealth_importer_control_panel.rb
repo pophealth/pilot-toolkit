@@ -59,9 +59,10 @@ class PophealthImporterControlPanel < JPanel
     # always remember thread safety when processing events!
     @pophealth_listeners.synchronized do
       @pophealth_listeners.each do |registered_listener|
-        case e.getActionCommand()
-          when "Play"   : registered_listener.play
-          when "Stop"   : registered_listener.stop
+        if (e.getActionCommand() == "Play")
+          registered_listener.play
+        else
+          registered_listener.stop
         end
       end
     end

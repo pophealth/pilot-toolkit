@@ -1,17 +1,13 @@
-
-
-
 require 'quality-measure-engine'
 require 'patient_summary_report'
 require 'nokogiri'
 require 'json'
 
-
 $coded_values = {}
 $uncoded = {}
 
 module CCRscan
- class CCR
+
 
 # initialize -- open the XML file and parse
     def initialize()
@@ -48,11 +44,9 @@ module CCRscan
 
 
 
-#
-## normalize_coding_system attempts to simplify analysis of the XML doc by normalizing the names of the coding systems
-## Input is a single "Code" node in the tree, and the side effect is to edit the CodingSystem subnode.
-##
-
+    # normalize_coding_system attempts to simplify analysis of the XML doc by 
+    # normalizing the names of the coding systems.  Input is a single "Code" node 
+    # in the tree, and the side effect is to edit the CodingSystem subnode.
     def normalize_coding_system(code)
         lookup = {
              "lnc" => "LOINC",
@@ -195,3 +189,4 @@ if __FILE__ == $0
 
 
 end
+
