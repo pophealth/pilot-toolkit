@@ -27,9 +27,9 @@ module Stats
         entry_list.each {|entry| pss.add_entry(entry)}
         psr.send("#{section}=", pss)
       end
-
       psr
     end
 
   end
+
 end

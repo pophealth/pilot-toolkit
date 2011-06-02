@@ -10,6 +10,8 @@ module Validation
     import "javax.xml.transform.stream.StreamSource"
     import "javax.xml.transform.stream.StreamResult"
 
+    require 'nokogiri'
+
     def self.create_source(str)
       StreamSource.new(ByteArrayInputStream.new(java.lang.String.new(str).getBytes()))
     end
