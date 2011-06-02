@@ -39,6 +39,38 @@ class PophealthAnalysisThread < Thread
       @pophealth_jframe.set_analysis_progress_bar((file_counter.to_f)/(files.size.to_f))
       @pophealth_jframe.get_content_pane.repaint()
       analysis_results["file_validation"] = (file_validation_errors.to_f)/(files.size.to_f)
+      
+      analysis_results["allergies_present"] = 0.1
+      analysis_results["allergies_coded"] = 0.15
+      analysis_results["allergies_mu_compliant"] = 0.17
+      
+      analysis_results["encounters_present"] = 0.20
+      analysis_results["encounters_coded"] = 0.23
+      analysis_results["encounters_mu_compliant"] = 0.25
+      
+      analysis_results["conditions_present"] = 0.27
+      analysis_results["conditions_coded"] = 0.30
+      analysis_results["conditions_mu_compliant"] = 0.32
+      
+      analysis_results["lab_results_present"] = 0.35
+      analysis_results["lab_results_coded"] = 0.4
+      analysis_results["lab_results_mu_compliant"] = 0.45
+      
+      analysis_results["immunizations_present"] = 0.5
+      analysis_results["immunizations_coded"] = 0.55
+      analysis_results["immunizations_mu_compliant"] = 0.6
+      
+      analysis_results["medications_present"] = 0.7
+      analysis_results["medications_coded"] = 0.75
+      analysis_results["medications_mu_compliant"] = 0.8
+      
+      analysis_results["procedures_present"] = 0.83
+      analysis_results["procedures_coded"] = 0.87
+      analysis_results["procedures_mu_compliant"] = 0.9
+      
+      analysis_results["vital_signs_present"] = 0.92
+      analysis_results["vital_signs_coded"] = 0.95
+      analysis_results["vital_signs_mu_compliant"] = 0.97
     end
     @pophealth_jframe.update_analysis_results(analysis_results)
     @pophealth_jframe.enable_play
