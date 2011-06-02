@@ -19,11 +19,13 @@ class PophealthIndividualResultsPanel < JPanel
     left_panel.setLayout(BorderLayout.new(10, 10))
     display_label = JLabel.new(display_name)
     # make the font bold
-    display_label.setFont(Font.new(display_label.getFont().getName(), Font::BOLD, display_label.getFont().getSize()))
+    display_label.setFont(Font.new(display_label.getFont().getName(),
+                          Font::BOLD,
+                          display_label.getFont().getSize()))
     if !display_numeric_visualization
-      display_label.setForeground(Color.new(129, 179, 60)) # popHealth "green"
+      display_label.setForeground(Color.new(129, 179, 60)) # popHealth green
     else
-      display_label.setForeground(Color.new(86, 160, 171)) # popHealth "blue"
+      display_label.setForeground(Color.new(86, 160, 171)) # popHealth blue
     end
     left_panel.add(display_label, BorderLayout::CENTER)
     self.add(left_panel, BorderLayout::WEST)
@@ -46,10 +48,14 @@ class PophealthIndividualResultsPanel < JPanel
     @percentage_label.setText(percentage.truncate.to_s + "% ")
     if percentage == 0.0
       @percentage_label.setForeground(Color::RED)
-      @percentage_label.setFont(Font.new(@percentage_label.getFont().getName(), Font::BOLD, @percentage_label.getFont().getSize()))
+      @percentage_label.setFont(Font.new(@percentage_label.getFont().getName(),
+                                Font::BOLD,
+                                @percentage_label.getFont().getSize()))
     else
       @percentage_label.setForeground(Color::BLACK)
-      @percentage_label.setFont(Font.new(@percentage_label.getFont().getName(), Font::PLAIN, @percentage_label.getFont().getSize()))
+      @percentage_label.setFont(Font.new(@percentage_label.getFont().getName(),
+                                Font::PLAIN,
+                                @percentage_label.getFont().getSize()))
     end
   end
 

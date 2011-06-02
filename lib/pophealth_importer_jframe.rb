@@ -73,13 +73,13 @@ class PophealthImporterJframe < JFrame
     @progress_bar.set_string_painted false
     @progress_bar.set_border_painted true
     @progress_bar.set_preferred_size(Dimension.new(700, 20))
-    progress_panel = JPanel.new()
-    progress_panel.setLayout(FlowLayout.new())
-    progress_panel.add(JLabel.new("  XML File Analysis:"))
-    progress_panel.add(@progress_bar)
+    bottom_panel = JPanel.new()
+    bottom_panel.setLayout(FlowLayout.new())
+    bottom_panel.add(JLabel.new("  Pre-Process Report Analysis:"))
+    bottom_panel.add(@progress_bar)
 
     @content_pane.add(@split_pane, BorderLayout::CENTER)
-    @content_pane.add(progress_panel, BorderLayout::SOUTH)
+    @content_pane.add(bottom_panel, BorderLayout::NORTH)
 
     getContentPane().add(@content_pane)
     setSize(@@initial_window_dimension)
