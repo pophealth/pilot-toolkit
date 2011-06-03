@@ -1,7 +1,49 @@
+
+require 'quality-measure-engine'
+
+
+
 # Stats object collects statistics regarding the content of a single section of a Patient Summary (C32 or CCR)
 # As entries are added to the section, they are classified as coded vs uncoded, and within the coded as MU 
 # (meaningful use) coded, or alien (not the relevant code set for meaningful use). 
 module Stats
+
+# NEED TO ADD A + operator that merges the Codes hash?
+# get rid of subclass and just make a class with count, description and codes...much easier
+  class StatsEntry < QME::Importer::Entry
+      attr_accessor :count, :codes
+
+    def initialize
+         count = 1
+    end
+
+    def count
+       @count
+    end
+    def self.fromEntry(entry)
+       sentry = Stats::StatsEntry.new
+       sentry.codes = entry.codes
+       sentry.description = entry.description
+       sentry.count = 1
+       return sentry
+    end
+
+    def add(entry)
+        raise "Only entries with the same description can be added" unless entry.description == @description
+        @count += entry.count
+        entry.codes.each_pair do | codeset, values|
+           codes[codeset] ||= []  # if it doesn't exist add it
+           codes[codeset] = values.to_set.union(codes[codeset].to_set).to_a   # result is the union of codes for this codeset
+        end
+    end
+    def dump(outfp)
+       outfp.puts "StatsEntry:   description = #{@description}   count = #{@count}"
+        codes.each_pair do | codeset, values|
+           outfp.puts "\tcodeset #{codeset}  values #{values.join(',')}"
+        end
+    end
+   end
+
 
   class PatientSummarySection
 
@@ -10,7 +52,7 @@ module Stats
 
     def initialize(name, mu_code_systems)
       @name = name
-
+      @entries = []
       @mu_code_systems_found = {}
       @alien_code_systems_found = {}
       @uncoded_entries = []
@@ -19,6 +61,44 @@ module Stats
       @mu_code_systems = mu_code_systems
     end
     
+
+    def unique_non_mu_entries
+        STDERR.puts "uncoded = #{uncoded_entries.size} alien = #{alien_coded_entries.size}"
+        unique_entries = { @name => { :mucodesystems => @mu_code_systems,
+                                     :entries => {}
+                                   }
+                          }
+        uhash = unique_entries[@name][:entries]
+
+        uncoded_entries.each do | entry |
+                sentry = Stats::StatsEntry.fromEntry(entry)
+               if(uhash[sentry.description])
+                uhash[sentry.description].add(sentry)
+               else
+                uhash[sentry.description] = sentry
+               end
+        end
+        alien_coded_entries.each do | entry |
+               sentry = Stats::StatsEntry.fromEntry(entry)
+              if(uhash[sentry.description])
+                uhash[sentry.description].add(sentry)
+               else
+                uhash[sentry.description] = sentry
+               end
+         end
+
+        uhash.each_pair do | desc, entry |
+            STDERR.puts "desc= #{desc}   count = #{entry.count} codes = #{entry.codes}"
+        end
+
+       uhash.each_pair do | desc, entry |
+         uhash[desc] = { :count => entry.count,
+                         :codes => entry.codes }
+       end
+
+       return unique_entries
+    end
+
 #
     def summary
        results = { @name => { "entries" => "#{num_coded_entries + num_uncoded_entries}",
@@ -103,15 +183,43 @@ if __FILE__ == $0
    section = Stats::PatientSummarySection.new("junk",["ICD9","ICD10","SNOMEDCT"])
 
    entry = QME::Importer::Entry.new
+   entry.description = "test_entry 1"
    entry.add_code(32000, "ICD9")
    entry.add_code(32001,"ICD9")
-   entry.add_code(32000, "ICD10")
+   entry.add_code(32000, "LOINC")
    entry.add_code(32001,"ICD10")
    entry.add_code(1,"GORK")
    section.add_entry(entry)
+   entry1 = QME::Importer::Entry.new
+   entry1.description = "test_entry 2"
+   entry1.add_code(32000, "ICD9")
+   entry1.add_code(32002,"ICD9")
+   entry1.add_code(32000, "FOO1")
+   entry1.add_code(32001,"BAR1")
+   section.add_entry(entry)
+   entry2 = QME::Importer::Entry.new
+   entry2.description = "test_entry 3"
+   entry2.add_code(32000, "FOO")
+   entry2.add_code(32002,"FOO")
+   entry2.add_code(32000, "BAR")
+   entry2.add_code(32001,"BAR1")
+   section.add_entry(entry2)
+  entry3 = QME::Importer::Entry.new
+   entry3.description = "test_entry 3"
+   entry3.add_code(32002, "FOO")
+   entry3.add_code(32004,"FOO")
+   entry3.add_code(32006, "BAR")
+   entry3.add_code(32008,"BAR1")
+   section.add_entry(entry3)
    section.dump(STDERR)
    STDERR.puts section.summary
-
+   STDERR.puts JSON.pretty_generate(section.unique_non_mu_entries)
+   entrya = Stats::StatsEntry.fromEntry(entry)
+   entry1a = Stats::StatsEntry.fromEntry(entry1)
+   entry1a.description = entrya.description
+ 
+   entrya.add(entry1a)
+   entrya.dump(STDERR)
 
 end
 

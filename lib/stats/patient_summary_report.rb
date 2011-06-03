@@ -36,7 +36,10 @@ module Stats
       patient_entry_hash = pi.create_c32_hash(document)
       patient_entry_hash.each_pair do |section, entry_list|
         pss = PatientSummarySection.new(section, @@mu_code_sets[section])
-        entry_list.each {|entry| pss.add_entry(entry)}
+        entry_list.each do |entry| 
+                pss.add_entry(entry) 
+#                STDERR.puts "desc = #{entry.description}"
+        end
         psr.send("#{section}=", pss)
       end
      psr
@@ -131,6 +134,46 @@ module Stats
       return summary_hash
 
    end
+   def unique_non_mu_entries
+        summary_hash = {}
+         if(@allergies) 
+            summary_hash.merge!(@allergies.unique_non_mu_entries)
+         end
+         if(@care_goals)
+                summary_hash.merge!(@care_goals.unique_non_mu_entries)
+         end
+         if(@conditions)
+                summary_hash.merge!(@conditions.unique_non_mu_entries)
+         end
+         if (@encounters)
+                summary_hash.merge!(@encounters.unique_non_mu_entries)
+         end
+         if (@immunizatons)
+                summary_hash.merge!(@immunizatons.unique_non_mu_entries)
+         end
+         if (@medical_equipment)
+                summary_hash.merge!(@medical_equipment.unique_non_mu_entries)
+         end
+         if (@medications)
+                summary_hash.merge!(@medications.unique_non_mu_entries)
+         end
+         if (@procedures)
+                summary_hash.merge!(@procedures.unique_non_mu_entries)
+          end
+        if (@results)
+                summary_hash.merge!(@results.unique_non_mu_entries)
+         end
+         if (@social_history)
+                summary_hash.merge!(@social_history.unique_non_mu_entries)
+         end
+         if (@vital_signs)
+                summary_hash.merge!(@vital_signs.unique_non_mu_entries)
+         end
+      return summary_hash
+
+   end
+
+
 end
 
 end
