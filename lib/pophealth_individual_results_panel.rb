@@ -45,8 +45,12 @@ class PophealthIndividualResultsPanel < JPanel
   def set_percentage(percentage)
     @bar_chart.set_percentage(percentage)
     percentage = percentage * 100
-    @percentage_label.setText(percentage.truncate.to_s + "% ")
-    if percentage == 0.0
+    if percentage < 0.0
+      @percentage_label.setText("N/A")
+    else
+      @percentage_label.setText(percentage.truncate.to_s + "% ")
+    end
+    if percentage <= 0.0
       @percentage_label.setForeground(Color::RED)
       @percentage_label.setFont(Font.new(@percentage_label.getFont().getName(),
                                 Font::BOLD,

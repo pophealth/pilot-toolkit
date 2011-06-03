@@ -54,14 +54,14 @@ class PophealthImporterJframe < JFrame
     @list_selection_listener = PophealthListSelectionListener.new(self)
     @file_list.add_list_selection_listener(@list_selection_listener)
 
-    @file_scroll_pane = JScrollPane.new(@file_list)
-    @summary_scroll_pane = JScrollPane.new(@summary_text_area)
-    @display_scroll_pane = JScrollPane.new(@file_content_text_area)
-    @error_scroll_pane = JScrollPane.new(@file_error_text_area)
+    @file_scroll_pane =     JScrollPane.new(@file_list)
+    @summary_scroll_pane =  JScrollPane.new(@summary_text_area)
+    @display_scroll_pane =  JScrollPane.new(@file_content_text_area)
+    @error_scroll_pane =    JScrollPane.new(@file_error_text_area)
 
     @tabbed_pane = JTabbedPane.new()
-    @tabbed_pane.add("Summary Report", @summary_scroll_pane)
-    @tabbed_pane.add("File Contents", @display_scroll_pane)
+    @tabbed_pane.add("Summary Report",  @summary_scroll_pane)
+    @tabbed_pane.add("File Contents",   @display_scroll_pane)
     @tabbed_pane.add("Errors/Warnings", @error_scroll_pane)
 
     @split_pane = JSplitPane.new(JSplitPane::HORIZONTAL_SPLIT,
@@ -79,7 +79,7 @@ class PophealthImporterJframe < JFrame
     bottom_panel.add(JLabel.new("  Pre-Process Report Analysis:"))
     bottom_panel.add(@progress_bar)
 
-    @content_pane.add(@split_pane, BorderLayout::CENTER)
+    @content_pane.add(@split_pane,  BorderLayout::CENTER)
     @content_pane.add(bottom_panel, BorderLayout::NORTH)
 
     getContentPane().add(@content_pane)
@@ -132,9 +132,11 @@ class PophealthImporterJframe < JFrame
         c32_schematron_errors = @c32_schematron_validator.validate(c32)
         validation_errors += c32_schematron_errors.join("\n")
       else
-        ccr = File.read(@file_list.get_selected_value.get_file.get_path)
-        ccr_schema_errors= @ccr_schema_validator.validate(ccr)
-        validation_errors += ccr_schema_errors.join("\n")
+        if @ccr_schema_validator
+          ccr = File.read(@file_list.get_selected_value.get_file.get_path)
+          ccr_schema_errors= @ccr_schema_validator.validate(ccr)
+          validation_errors += ccr_schema_errors.join("\n")
+        end
       end
       @file_error_text_area.set_text(validation_errors)
     else

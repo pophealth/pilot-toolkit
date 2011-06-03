@@ -52,8 +52,7 @@ class PophealthAnalysisThread < Thread
         patient_summary_report = Stats::PatientSummaryReport.from_c32(doc)
         update_analysis_results(patient_summary_report, analysis_results)
       else
-        puts "Insert logic to consider CCR file"
-        if @ccr_schema_validator.validate(continuity_of_care_record).size() > 0
+        if @ccr_schema_validator && @ccr_schema_validator.validate(continuity_of_care_record).size() > 0
           file_validation_errors += 1
         end
       end
@@ -61,8 +60,22 @@ class PophealthAnalysisThread < Thread
       @pophealth_jframe.set_analysis_progress_bar((file_counter.to_f) / (files.size.to_f))
       @pophealth_jframe.get_content_pane.repaint()
     end
-    analysis_results["number_files"] =    files.size
-    analysis_results["file_validation"] = files.size-file_validation_errors
+    analysis_results["number_files"] = files.size
+    # if running in CCR mode, and the user has not setup a CCR schema file, send message to the
+    # display that they need to buy the CCR schema file and configure the importer
+    if (PophealthImporterListener.continuity_of_care_mode == :ccr_mode && !@ccr_schema_validator)
+      analysis_results["file_validation"] = -1
+      JOptionPane.showMessageDialog(@pophealth_jframe,
+        "There currently is not a CCR Schema file setup in the popHealth importer\n" + 
+        "In order to support CCR Schema validation, you should purchase a CCR Schema\n" +
+        "file from the ASTM website http://www.astm.org/Standards/E2369.htm and put\n" +
+        "your CCR Schema file in the file system directory\n" + 
+        "pilot_toolkit/resources/xml_schema/ccr/infrastructure/ccr.xsd",
+        "popHealth: Missing CCR Schema XSD File",
+        JOptionPane::WARNING_MESSAGE)
+    else
+      analysis_results["file_validation"] = files.size - file_validation_errors
+    end
     @pophealth_jframe.update_analysis_results(analysis_results)
     @pophealth_jframe.enable_play
     @pophealth_jframe.set_analysis_progress_bar(0)
