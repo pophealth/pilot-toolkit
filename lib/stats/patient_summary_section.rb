@@ -69,11 +69,11 @@ module Stats
                 return {}
         end
         STDERR.puts "uncoded = #{uncoded_entries.size} alien = #{alien_coded_entries.size}"
-        unique_entries = { @name => { :mucodesystems => @mu_code_systems,
-                                     :entries => {}
+        unique_entries = { @name => { "mucodesystems" => @mu_code_systems,
+                                     "entries" => {}
                                    }
                           }
-        uhash = unique_entries[@name][:entries]
+        uhash = unique_entries[@name]["entries"]
 
         uncoded_entries.each do | entry |
                 sentry = Stats::StatsEntry.fromEntry(entry)
@@ -92,16 +92,16 @@ module Stats
                end
          end
 
-        uhash.each_pair do | desc, entry |
-            STDERR.puts "desc= #{desc}   count = #{entry.count} codes = #{entry.codes}"
-        end
+#        uhash.each_pair do | desc, entry |
+#            STDERR.puts "desc= #{desc}   count = #{entry.count} codes = #{entry.codes}"
+#        end
 
        uhash.each_pair do | desc, entry |
          if(entry.codes.size > 0)
-                uhash[desc] = { :count => entry.count,
-                                :codes => entry.codes }
+                uhash[desc] = { "count" => entry.count,
+                                "codes" => entry.codes }
          else
-                 uhash[desc] = { :count => entry.count }
+                 uhash[desc] = { "count" => entry.count }
          end
           
        end
@@ -215,12 +215,19 @@ if __FILE__ == $0
    entry2.add_code(32001,"BAR1")
    section.add_entry(entry2)
   entry3 = QME::Importer::Entry.new
-   entry3.description = "test_entry 3"
+   entry3.description = "test_entry 4"
    entry3.add_code(32002, "FOO")
    entry3.add_code(32004,"FOO")
    entry3.add_code(32006, "BAR")
    entry3.add_code(32008,"BAR1")
    section.add_entry(entry3)
+   unique_non_mu_entries = section.unique_non_mu_entries
+   unique_non_mu_entries.each_pair do | key, value |
+        STDERR.puts "key = #{key}   value = #{value}   valueclass = #{value.class}"
+        value.each_pair do | k,v|
+               STDERR.puts "\tkey = #{k}   value = #{v}   valueclass = #{v.class}"
+        end
+   end
    section.dump(STDERR)
    STDERR.puts section.summary
    STDERR.puts JSON.pretty_generate(section.unique_non_mu_entries)

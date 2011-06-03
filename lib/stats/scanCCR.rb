@@ -1,7 +1,8 @@
-require 'quality-measure-engine'
-require 'patient_summary_report'
-require 'nokogiri'
-require 'json'
+#require 'quality-measure-engine'
+#require 'patient_summary_report'
+#require 'nokogiri'
+#require 'json'
+require 'lib/pilot_toolkit'
 
 $coded_values = {}
 $uncoded = {}
@@ -96,7 +97,7 @@ def process_product_codes(node,entry)
 end
 
 def process_section(section_name)
-     STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
+#     STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
      entries = @doc.xpath(@sections[section_name])
      if(entries.size == 0)
         return
@@ -113,7 +114,7 @@ end
 
 
 def process_vital_signs (section_name)
-     STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
+#     STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
       results = @doc.xpath(@sections[section_name])
       if (results.size == 0)
         return
@@ -124,7 +125,7 @@ def process_vital_signs (section_name)
          process_codes(result, entry)
 
          test = result.xpath("./Test")
-        STDERR.puts "test.size = #{test.size}"
+#        STDERR.puts "test.size = #{test.size}"
          if (test.size > 0 && test.xpath("./Description/Text").size > 0)
                 
                 process_codes(test,entry)   # add them to the entry
