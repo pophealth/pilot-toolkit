@@ -13,10 +13,13 @@ module Validation
     end
 
     def self.ccr_schema_validator
+      @ccr_schema_validator = nil
       # Because of licensing issues with ASTM and the CCR schema, the user may or may not have purchased
       # and downloaded the CCR schema .xsd, and integrated it with the popHealth importer user
       # interface.  Therefore, if the schema file is not present, return nil.
-      @ccr_schema_validator ||= XMLSchemaValidator.new('resources/xml_schema/ccr/infrastructure/ccr.xsd')
+      if (File.exists?("resources/xml_schema/ccr/infrastructure/ccr.xsd"))
+        @ccr_schema_validator ||= XMLSchemaValidator.new('resources/xml_schema/ccr/infrastructure/ccr.xsd')
+      end
       @ccr_schema_validator
     end
 

@@ -50,11 +50,7 @@ class PophealthSummaryPanel < JPanel
   def setup_summary_level_status
     # Summary Validation Status
     self.add(PophealthIndividualResultsPanel.new("File-Level Validation", false))
-    if (PophealthImporterListener.continuity_of_care_mode == :c32_mode)
-      @overall_validation_status = PophealthIndividualResultsPanel.new("Valid HITSP C32 XML Files:", true)
-    else
-      @overall_validation_status = PophealthIndividualResultsPanel.new("Valid ASTM CCR XML Files:", true)
-    end
+    @overall_validation_status = PophealthIndividualResultsPanel.new("Valid Continuity of Care XML Files:", true)
     self.add(@overall_validation_status)
   end
 

@@ -35,7 +35,7 @@ class PophealthImporterMenuBar < JMenuBar
     @quit_menu_item =  JMenuItem.new("Quit")
     @quit_menu_item.addActionListener(self)
 
-    @play_menu_item =  JMenuItem.new("Play")
+    @play_menu_item =  JMenuItem.new("Import")
     @play_menu_item.addActionListener(self)
     @play_menu_item.setEnabled(false)
     @stop_menu_item =  JMenuItem.new("Stop")
