@@ -3,7 +3,7 @@ require 'lib/pilot_toolkit'
 
 class PatientSummarySectionTest < Test::Unit::TestCase
   def test_add_entry
-    section = Stats::PatientSummarySection.new(["ICD9","ICD10","SNOMEDCT"])
+    section = Stats::PatientSummarySection.new("test", ["ICD9","ICD10","SNOMEDCT"])
     entry = QME::Importer::Entry.new
     entry.add_code(32000, "ICD9")
     entry.add_code(32001,"ICD9")
