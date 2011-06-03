@@ -61,8 +61,13 @@ module Stats
       @mu_code_systems = mu_code_systems
     end
     
-
+# Return a hash entry that includes a hash of entries with unique desciprions within this section
+# If there are no entries, the hash is empty.
     def unique_non_mu_entries
+        # if there are no entries, return an empty hash
+        if(uncoded_entries.size + alien_coded_entries.size == 0)
+                return {}
+        end
         STDERR.puts "uncoded = #{uncoded_entries.size} alien = #{alien_coded_entries.size}"
         unique_entries = { @name => { :mucodesystems => @mu_code_systems,
                                      :entries => {}
@@ -92,8 +97,13 @@ module Stats
         end
 
        uhash.each_pair do | desc, entry |
-         uhash[desc] = { :count => entry.count,
-                         :codes => entry.codes }
+         if(entry.codes.size > 0)
+                uhash[desc] = { :count => entry.count,
+                                :codes => entry.codes }
+         else
+                 uhash[desc] = { :count => entry.count }
+         end
+          
        end
 
        return unique_entries

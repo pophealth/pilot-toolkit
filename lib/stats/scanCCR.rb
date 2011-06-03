@@ -7,7 +7,7 @@ $coded_values = {}
 $uncoded = {}
 
 module CCRscan
-
+ class CCR
 
 # initialize -- open the XML file and parse
     def initialize()
