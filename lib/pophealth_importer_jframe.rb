@@ -28,8 +28,9 @@ class PophealthImporterJframe < JFrame
 
     super("popHealth Continuity of Care XML Importer")
 
-    @schematron_validator = Validation::ValidatorRegistry.c32_schematron_validator
-    @schema_validator = Validation::ValidatorRegistry.c32_xml_schema_validator
+    @c32_schematron_validator = Validation::ValidatorRegistry.c32_schematron_validator
+    @c32_schema_validator =     Validation::ValidatorRegistry.c32_schema_validator
+    @ccr_schema_validator =     Validation::ValidatorRegistry.ccr_schema_validator
 
     # setup children UI components
     @pophealth_importer_menu_bar = PophealthImporterMenuBar.new()
@@ -124,11 +125,17 @@ class PophealthImporterJframe < JFrame
   def update_text_areas
     if @file_list.get_selected_value.is_valid_format
       validation_errors = ""
-      c32 = File.read(@file_list.get_selected_value.get_file.get_path)
-      c32_schema_errors= @schema_validator.validate(c32)
-      validation_errors += c32_schema_errors.join("\n")
-      c32_schematron_errors = @schematron_validator.validate(c32)
-      validation_errors += c32_schematron_errors.join("\n")
+      if (PophealthImporterListener.continuity_of_care_mode == :c32_mode)
+        c32 = File.read(@file_list.get_selected_value.get_file.get_path)
+        c32_schema_errors= @c32_schema_validator.validate(c32)
+        validation_errors += c32_schema_errors.join("\n")
+        c32_schematron_errors = @c32_schematron_validator.validate(c32)
+        validation_errors += c32_schematron_errors.join("\n")
+      else
+        ccr = File.read(@file_list.get_selected_value.get_file.get_path)
+        ccr_schema_errors= @ccr_schema_validator.validate(ccr)
+        validation_errors += ccr_schema_errors.join("\n")
+      end
       @file_error_text_area.set_text(validation_errors)
     else
       @file_error_text_area.set_text("")

@@ -16,24 +16,24 @@ module Validation
     # Validate the document against the configured schema
     def validate(document)
       errors = []
-      begin 
+      begin
         doc = @document_builder.parse(ByteArrayInputStream.new(java.lang.String.new(document.to_s).getBytes))
         source = javax.xml.transform.dom.DOMSource.new(doc)
-        validator = @schema.newValidator();
-        validator.validate(source);
-     rescue 
+        validator = @schema.newValidator()
+        validator.validate(source)
+     rescue
         # this is where we will do something with the error
         errors << {:error_message => $!.message}
      end
      errors
     end
 
-    private 
+    private
 
     # set the schema file and create the java objects to perfrom the validation
     def set_schema(file)
       factory = javax.xml.validation.SchemaFactory.newInstance(javax.xml.XMLConstants::W3C_XML_SCHEMA_NS_URI)
-      schemaFile =  javax.xml.transform.stream.StreamSource.new(java.io.File.new(file));
+      schemaFile = javax.xml.transform.stream.StreamSource.new(java.io.File.new(file))
       @schema = factory.newSchema(schemaFile)
       @document_builder_factory =  javax.xml.parsers.DocumentBuilderFactory.newInstance()
       @document_builder_factory.setNamespaceAware(true)

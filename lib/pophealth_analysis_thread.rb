@@ -4,8 +4,9 @@ import "javax.swing.JOptionPane"
 class PophealthAnalysisThread < Thread
 
   def initialize
-    @schematron_validator = Validation::ValidatorRegistry.c32_schematron_validator
-    @schema_validator = Validation::ValidatorRegistry.c32_xml_schema_validator
+    @c32_schematron_validator = Validation::ValidatorRegistry.c32_schematron_validator
+    @c32_schema_validator =     Validation::ValidatorRegistry.c32_schema_validator
+    @ccr_schema_validator =     Validation::ValidatorRegistry.ccr_schema_validator
   end
 
   def set_parent_jframe(parent_jframe)
@@ -41,8 +42,8 @@ class PophealthAnalysisThread < Thread
       puts "Considering " + next_file.to_s
       continuity_of_care_record = File.read(next_file.get_path)
       if (PophealthImporterListener.continuity_of_care_mode == :c32_mode)
-        c32_schema_errors= @schema_validator.validate(continuity_of_care_record)
-        c32_schematron_errors = @schematron_validator.validate(continuity_of_care_record)
+        c32_schema_errors = @c32_schema_validator.validate(continuity_of_care_record)
+        c32_schematron_errors = @c32_schematron_validator.validate(continuity_of_care_record)
         if (c32_schema_errors.size > 0 || c32_schematron_errors.size > 0)
           file_validation_errors += 1
         end
@@ -52,9 +53,12 @@ class PophealthAnalysisThread < Thread
         update_analysis_results(patient_summary_report, analysis_results)
       else
         puts "Insert logic to consider CCR file"
+        if @ccr_schema_validator.validate(continuity_of_care_record).size() > 0
+          file_validation_errors += 1
+        end
       end
       file_counter += 1
-      @pophealth_jframe.set_analysis_progress_bar((file_counter.to_f)/(files.size.to_f))
+      @pophealth_jframe.set_analysis_progress_bar((file_counter.to_f) / (files.size.to_f))
       @pophealth_jframe.get_content_pane.repaint()
     end
     analysis_results["number_files"] =    files.size
@@ -109,32 +113,32 @@ class PophealthAnalysisThread < Thread
 
   def prime_analysis_results
     analysis_results = {
-      "number_files" => 0.0,
-      "file_validation" => 0.0,
-      "allergies_present" => 0.0,
-      "allergies_coded" => 0.0,
-      "allergies_mu_compliant" => 0.0,
-      "encounters_present" => 0.0,
-      "encounters_coded" => 0.0,
-      "encounters_mu_compliant" => 0.0,
-      "conditions_present" => 0.0,
-      "conditions_coded" => 0.0,
-      "conditions_mu_compliant" => 0.0,                        
-      "lab_results_present" => 0.0,
-      "lab_results_coded" => 0.0,
-      "lab_results_mu_compliant" => 0.0,
-      "immunizations_present" => 0.0,
-      "immunizations_coded" => 0.0,
-      "immunizations_mu_compliant" => 0.0,
-      "medications_present" => 0.0,
-      "medications_coded" => 0.0,
-      "medications_mu_compliant" => 0.0,
-      "procedures_present" => 0.0,
-      "procedures_coded" => 0.0,
-      "procedures_mu_compliant" => 0.0,
-      "vital_signs_present" => 0.0,
-      "vital_signs_coded" => 0.0,
-      "vital_signs_mu_compliant" => 0.0
+      "number_files"                => 0.0,
+      "file_validation"             => 0.0,
+      "allergies_present"           => 0.0,
+      "allergies_coded"             => 0.0,
+      "allergies_mu_compliant"      => 0.0,
+      "encounters_present"          => 0.0,
+      "encounters_coded"            => 0.0,
+      "encounters_mu_compliant"     => 0.0,
+      "conditions_present"          => 0.0,
+      "conditions_coded"            => 0.0,
+      "conditions_mu_compliant"     => 0.0,
+      "lab_results_present"         => 0.0,
+      "lab_results_coded"           => 0.0,
+      "lab_results_mu_compliant"    => 0.0,
+      "immunizations_present"       => 0.0,
+      "immunizations_coded"         => 0.0,
+      "immunizations_mu_compliant"  => 0.0,
+      "medications_present"         => 0.0,
+      "medications_coded"           => 0.0,
+      "medications_mu_compliant"    => 0.0,
+      "procedures_present"          => 0.0,
+      "procedures_coded"            => 0.0,
+      "procedures_mu_compliant"     => 0.0,
+      "vital_signs_present"         => 0.0,
+      "vital_signs_coded"           => 0.0,
+      "vital_signs_mu_compliant"    => 0.0
     }
   end
 
