@@ -28,8 +28,9 @@ class PophealthImporterJframe < JFrame
 
     super("popHealth Continuity of Care XML Importer")
 
-    @schematron_validator = Validation::ValidatorRegistry.c32_schematron_validator
-    @schema_validator = Validation::ValidatorRegistry.c32_xml_schema_validator
+    @c32_schematron_validator = Validation::ValidatorRegistry.c32_schematron_validator
+    @c32_schema_validator =     Validation::ValidatorRegistry.c32_schema_validator
+    @ccr_schema_validator =     Validation::ValidatorRegistry.ccr_schema_validator
 
     # setup children UI components
     @pophealth_importer_menu_bar = PophealthImporterMenuBar.new()
@@ -53,14 +54,14 @@ class PophealthImporterJframe < JFrame
     @list_selection_listener = PophealthListSelectionListener.new(self)
     @file_list.add_list_selection_listener(@list_selection_listener)
 
-    @file_scroll_pane = JScrollPane.new(@file_list)
-    @summary_scroll_pane = JScrollPane.new(@summary_text_area)
-    @display_scroll_pane = JScrollPane.new(@file_content_text_area)
-    @error_scroll_pane = JScrollPane.new(@file_error_text_area)
+    @file_scroll_pane =     JScrollPane.new(@file_list)
+    @summary_scroll_pane =  JScrollPane.new(@summary_text_area)
+    @display_scroll_pane =  JScrollPane.new(@file_content_text_area)
+    @error_scroll_pane =    JScrollPane.new(@file_error_text_area)
 
     @tabbed_pane = JTabbedPane.new()
-    @tabbed_pane.add("Summary Report", @summary_scroll_pane)
-    @tabbed_pane.add("File Contents", @display_scroll_pane)
+    @tabbed_pane.add("Summary Report",  @summary_scroll_pane)
+    @tabbed_pane.add("File Contents",   @display_scroll_pane)
     @tabbed_pane.add("Errors/Warnings", @error_scroll_pane)
 
     @split_pane = JSplitPane.new(JSplitPane::HORIZONTAL_SPLIT,
@@ -73,13 +74,13 @@ class PophealthImporterJframe < JFrame
     @progress_bar.set_string_painted false
     @progress_bar.set_border_painted true
     @progress_bar.set_preferred_size(Dimension.new(700, 20))
-    progress_panel = JPanel.new()
-    progress_panel.setLayout(FlowLayout.new())
-    progress_panel.add(JLabel.new("  XML File Analysis:"))
-    progress_panel.add(@progress_bar)
+    bottom_panel = JPanel.new()
+    bottom_panel.setLayout(FlowLayout.new())
+    bottom_panel.add(JLabel.new("  Pre-Process Report Analysis:"))
+    bottom_panel.add(@progress_bar)
 
-    @content_pane.add(@split_pane, BorderLayout::CENTER)
-    @content_pane.add(progress_panel, BorderLayout::SOUTH)
+    @content_pane.add(@split_pane,  BorderLayout::CENTER)
+    @content_pane.add(bottom_panel, BorderLayout::NORTH)
 
     getContentPane().add(@content_pane)
     setSize(@@initial_window_dimension)
@@ -124,11 +125,19 @@ class PophealthImporterJframe < JFrame
   def update_text_areas
     if @file_list.get_selected_value.is_valid_format
       validation_errors = ""
-      c32 = File.read(@file_list.get_selected_value.get_file.get_path)
-      c32_schema_errors= @schema_validator.validate(c32)
-      validation_errors += c32_schema_errors.join("\n")
-      c32_schematron_errors = @schematron_validator.validate(c32)
-      validation_errors += c32_schematron_errors.join("\n")
+      if (PophealthImporterListener.continuity_of_care_mode == :c32_mode)
+        c32 = File.read(@file_list.get_selected_value.get_file.get_path)
+        c32_schema_errors= @c32_schema_validator.validate(c32)
+        validation_errors += c32_schema_errors.join("\n")
+        c32_schematron_errors = @c32_schematron_validator.validate(c32)
+        validation_errors += c32_schematron_errors.join("\n")
+      else
+        if @ccr_schema_validator
+          ccr = File.read(@file_list.get_selected_value.get_file.get_path)
+          ccr_schema_errors= @ccr_schema_validator.validate(ccr)
+          validation_errors += ccr_schema_errors.join("\n")
+        end
+      end
       @file_error_text_area.set_text(validation_errors)
     else
       @file_error_text_area.set_text("")

@@ -16,10 +16,10 @@ class PophealthImporterControlPanel < JPanel
     # all the listeners registered with this menu bar
     @pophealth_listeners = Vector.new()
 
-    @play_button =  JButton.new("Play")
+    @play_button = JButton.new("Import")
     @play_button.setEnabled(false)
     @play_button.addActionListener(self)
-    @stop_button =  JButton.new("Stop")
+    @stop_button = JButton.new("Stop")
     @stop_button.setEnabled(false)
     @stop_button.addActionListener(self)
 
@@ -59,7 +59,7 @@ class PophealthImporterControlPanel < JPanel
     # always remember thread safety when processing events!
     @pophealth_listeners.synchronized do
       @pophealth_listeners.each do |registered_listener|
-        if (e.getActionCommand() == "Play")
+        if (e.getActionCommand() == "Import")
           registered_listener.play
         else
           registered_listener.stop

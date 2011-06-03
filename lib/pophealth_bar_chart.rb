@@ -14,7 +14,7 @@ class PophealthBarChart < JPanel
   end
 
   def paint(g)
-    if @percentage == 0.0
+    if @percentage <= 0.0
       g.setColor(Color::PINK)
       g.fillRect(5, 5, 400, 20)
       g.setColor(Color::RED)

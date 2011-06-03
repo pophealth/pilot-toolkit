@@ -7,9 +7,20 @@ module Validation
       @c32_schematron_validator
     end
 
-    def self.c32_xml_schema_validator
-      @xml_schema_validator ||= XMLSchemaValidator.new('resources/xml_schema/cdar2c32/infrastructure/cda/C32_CDA.xsd')
-      @xml_schema_validator
+    def self.c32_schema_validator
+      @c32_schema_validator ||= XMLSchemaValidator.new('resources/xml_schema/cdar2c32/infrastructure/cda/C32_CDA.xsd')
+      @c32_schema_validator
+    end
+
+    def self.ccr_schema_validator
+      @ccr_schema_validator = nil
+      # Because of licensing issues with ASTM and the CCR schema, the user may or may not have purchased
+      # and downloaded the CCR schema .xsd, and integrated it with the popHealth importer user
+      # interface.  Therefore, if the schema file is not present, return nil.
+      if (File.exists?("resources/xml_schema/ccr/infrastructure/ccr.xsd"))
+        @ccr_schema_validator ||= XMLSchemaValidator.new('resources/xml_schema/ccr/infrastructure/ccr.xsd')
+      end
+      @ccr_schema_validator
     end
 
   end
