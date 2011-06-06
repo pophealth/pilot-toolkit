@@ -1,6 +1,8 @@
 import "java.lang.Thread"
 import "javax.swing.JOptionPane"
 
+require_relative 'pophealth_import_file'
+
 class PophealthAnalysisThread < Thread
 
   def initialize
@@ -19,8 +21,14 @@ class PophealthAnalysisThread < Thread
 
   def run
     files = @import_directory.listFiles()
-    if (files && (files.size > 0))
-      analyze_data(files)
+    xmlfiles = []
+    files.each do |file|
+        if PophealthImportFile.new(file).is_valid_format 
+                xmlfiles << file
+        end
+    end
+    if (xmlfiles && (xmlfiles.size > 0))
+      analyze_data(xmlfiles)
     else
       JOptionPane.showMessageDialog(@pophealth_jframe,
         "Directory selected '" + @import_directory.to_s +
