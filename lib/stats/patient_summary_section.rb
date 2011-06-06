@@ -1,11 +1,9 @@
 
 require 'quality-measure-engine'
 
-
-
 # Stats object collects statistics regarding the content of a single section of a Patient Summary (C32 or CCR)
 # As entries are added to the section, they are classified as coded vs uncoded, and within the coded as MU 
-# (meaningful use) coded, or alien (not the relevant code set for meaningful use). 
+# (meaningful use) coded, or alien (not the relevant code set for meaningful use clinical quality measures). 
 module Stats
 
 # NEED TO ADD A + operator that merges the Codes hash?

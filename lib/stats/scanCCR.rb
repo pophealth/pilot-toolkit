@@ -1,11 +1,7 @@
-#require 'quality-measure-engine'
-#require 'patient_summary_report'
-#require 'nokogiri'
-#require 'json'
-require 'lib/pilot_toolkit'
 
-$coded_values = {}
-$uncoded = {}
+# CCRscan
+#  This module includes code for doing a quick and dirty parse of a CCR file, to produce a list of entries similar to those produced by the C32
+#  parser.
 
 module CCRscan
  class CCR
@@ -169,6 +165,10 @@ end
 
 # if launched as a standalone program, not loaded as a module
 if __FILE__ == $0
+require 'quality-measure-engine'
+require 'patient_summary_report'
+require 'nokogiri'
+require 'json'
 
 #  STDERR.puts "GORK"
   ccrFilePath = ARGV[0]
