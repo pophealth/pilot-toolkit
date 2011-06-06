@@ -111,7 +111,7 @@ module Stats
 
 #
     def summary
-       results = { @name => { "entries" => "#{num_coded_entries + num_uncoded_entries}",
+       results = { @name => { "entries" => num_coded_entries + num_uncoded_entries,
                              "mu code systems" => @mu_code_systems,
                              "coded entries" => num_coded_entries,
                              "mu coded entries" => num_mu_coded_entries,

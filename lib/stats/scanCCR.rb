@@ -136,7 +136,7 @@ def process_vital_signs (section_name)
 
 
 def process_medications (section_name)
-     STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
+#     STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
       meds = @doc.xpath(@sections[section_name])
       if(meds.size == 0)
         return
@@ -170,7 +170,7 @@ end
 # if launched as a standalone program, not loaded as a module
 if __FILE__ == $0
 
-  STDERR.puts "GORK"
+#  STDERR.puts "GORK"
   ccrFilePath = ARGV[0]
   doc = Nokogiri::XML(File.open(ccrFilePath) ) 
 
