@@ -188,7 +188,7 @@ end
 # if launched as a standalone program, not loaded as a module
 if __FILE__ == $0
 
-   section = Stats::PatientSummarySection.new("junk",["ICD9","ICD10","SNOMEDCT"])
+   section = Stats::PatientSummarySection.new("junk",["ICD9","ICD10","SNOMED-CT"])
 
    entry = QME::Importer::Entry.new
    entry.description = "test_entry 1"

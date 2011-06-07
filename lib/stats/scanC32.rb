@@ -1,5 +1,6 @@
 require 'quality-measure-engine'
 require 'patient_summary_report'
+require 'patient_summary_section'
 require 'nokogiri'
 require 'json'
 

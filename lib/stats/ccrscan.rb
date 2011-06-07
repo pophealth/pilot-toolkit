@@ -59,8 +59,9 @@ module CCRscan
              "loinc" => "LOINC",
              "cpt" => "CPT",
              "cpt-4" => "CPT",
-             "snomedct" => "SNOMEDCT",
-             "snomed-ct" => "SNOMEDCT",
+             "snomed" => "SNOMED-CT",
+             "snomedct" => "SNOMED-CT",
+             "snomed-ct" => "SNOMED-CT",
              "rxnorm" => "RxNorm",
              "icd9-cm" => "ICD-9-CM",
              "icd9" => "ICD-9-CM"

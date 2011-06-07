@@ -16,17 +16,17 @@ module Stats
     def initialize
         # Initialize the sections of the Patient Summary
       @@mu_code_sets = {}
-      @@mu_code_sets[:allergies] = ["RxNorm","SNOMEDCT"]
-      @@mu_code_sets[:care_goals] = ["SNOMEDCT"]
-      @@mu_code_sets[:conditions] = ["SNOMEDCT", "ICD-9-CM", "ICD-10-CM"]
+      @@mu_code_sets[:allergies] = ["RxNorm","SNOMED-CT"]
+      @@mu_code_sets[:care_goals] = ["SNOMED-CT"]
+      @@mu_code_sets[:conditions] = ["SNOMED-CT", "ICD-9-CM", "ICD-10-CM"]
       @@mu_code_sets[:encounters] = ["CPT"]
       @@mu_code_sets[:immunizations] = ["RxNorm","CVX"]
-      @@mu_code_sets[:medical_equipment] = ["SNOMEDCT"]
+      @@mu_code_sets[:medical_equipment] = ["SNOMED-CT"]
       @@mu_code_sets[:medications] = ["RxNorm","CVX"]
       @@mu_code_sets[:procedures] = ["CPT","ICD-9-CM","ICD-10-CM","HCPCS"]
-      @@mu_code_sets[:results] = ["LOINC","SNOMEDCT"]
-      @@mu_code_sets[:social_history] = ["SNOMEDCT"]
-      @@mu_code_sets[:vital_signs] = ["ICD-9-CM","ICD-10-CM","SNOMEDCT"]
+      @@mu_code_sets[:results] = ["LOINC","SNOMED-CT"]
+      @@mu_code_sets[:social_history] = ["SNOMED-CT"]
+      @@mu_code_sets[:vital_signs] = ["ICD-9-CM","ICD-10-CM","SNOMED-CT"]
    end
 
 
