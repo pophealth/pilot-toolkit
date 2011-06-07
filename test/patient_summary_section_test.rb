@@ -11,6 +11,7 @@ class PatientSummarySectionTest < Test::Unit::TestCase
     entry.add_code(32001,"ICD10")
     entry.add_code(1,"GORK")
     section.add_entry(entry)
+
     assert_equal 1, section.alien_code_systems_found.size
     assert section.alien_code_systems_found.include?('GORK')
     assert_equal 2, section.mu_code_systems_found.size
@@ -38,7 +39,7 @@ class PatientSummarySectionTest < Test::Unit::TestCase
    entry2.add_code(32000, "BAR")
    entry2.add_code(32001,"BAR1")
    section.add_entry(entry2)
-  entry3 = QME::Importer::Entry.new
+   entry3 = QME::Importer::Entry.new
    entry3.description = "test_entry 4"
    entry3.add_code(32002, "FOO")
    entry3.add_code(32004,"FOO")

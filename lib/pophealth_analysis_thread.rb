@@ -23,9 +23,9 @@ class PophealthAnalysisThread < Thread
     files = @import_directory.listFiles()
     xmlfiles = []
     files.each do |file|
-        if PophealthImportFile.new(file).is_valid_format 
-                xmlfiles << file
-        end
+      if PophealthImportFile.new(file).is_valid_format 
+        xmlfiles << file
+      end
     end
     if (xmlfiles && (xmlfiles.size > 0))
       analyze_data(xmlfiles)
@@ -63,6 +63,10 @@ class PophealthAnalysisThread < Thread
         if @ccr_schema_validator && @ccr_schema_validator.validate(continuity_of_care_record).size() > 0
           file_validation_errors += 1
         end
+        doc = Nokogiri::XML(continuity_of_care_record)
+        doc.root.add_namespace_definition('ccr', 'urn:astm-org:CCR')
+        patient_summary_report = Stats::PatientSummaryReport.from_ccr(doc)
+        update_analysis_results(patient_summary_report, analysis_results)
       end
       file_counter += 1
       @pophealth_jframe.set_analysis_progress_bar((file_counter.to_f) / (files.size.to_f))
@@ -91,44 +95,92 @@ class PophealthAnalysisThread < Thread
 
   def update_analysis_results(patient_summary_report, analysis_results)
     if (patient_summary_report.allergies)
-      analysis_results["allergies_present"] +=          patient_summary_report.allergies.entries.size
-      analysis_results["allergies_coded"] +=            patient_summary_report.allergies.num_coded_entries
-      analysis_results["allergies_mu_compliant"] +=     patient_summary_report.allergies.mu_coded_entries.size
+      if patient_summary_report.allergies.entries.size > 0
+        analysis_results["allergies_present"] += 1
+      end
+      if patient_summary_report.allergies.num_coded_entries > 0
+        analysis_results["allergies_coded"] += 1
+      end
+      if patient_summary_report.allergies.mu_coded_entries.size > 0
+        analysis_results["allergies_mu_compliant"] += 1
+      end
     end
     if (patient_summary_report.encounters)
-      analysis_results["encounters_present"] +=         patient_summary_report.encounters.entries.size
-      analysis_results["encounters_coded"] +=           patient_summary_report.encounters.num_coded_entries
-      analysis_results["encounters_mu_compliant"] +=    patient_summary_report.encounters.mu_coded_entries.size
+      if patient_summary_report.encounters.entries.size > 0
+        analysis_results["encounters_present"] += 1
+      end
+      if patient_summary_report.encounters.num_coded_entries > 0
+        analysis_results["encounters_coded"] += 1
+      end
+      if patient_summary_report.encounters.mu_coded_entries.size > 0
+        analysis_results["encounters_mu_compliant"] += 1
+      end
     end
     if (patient_summary_report.conditions)
-      analysis_results["conditions_present"] +=         patient_summary_report.conditions.entries.size
-      analysis_results["conditions_coded"] +=           patient_summary_report.conditions.num_coded_entries
-      analysis_results["conditions_mu_compliant"] +=    patient_summary_report.conditions.mu_coded_entries.size
+      if patient_summary_report.conditions.entries.size > 0
+        analysis_results["conditions_present"] += 1
+      end
+      if patient_summary_report.conditions.num_coded_entries > 0
+        analysis_results["conditions_coded"] += 1
+      end
+      if patient_summary_report.conditions.mu_coded_entries.size > 0
+        analysis_results["conditions_mu_compliant"] += 1
+      end
     end
     if (patient_summary_report.results)
-      analysis_results["lab_results_present"] +=        patient_summary_report.conditions.entries.size
-      analysis_results["lab_results_coded"] +=          patient_summary_report.conditions.num_coded_entries
-      analysis_results["lab_results_mu_compliant"] +=   patient_summary_report.conditions.mu_coded_entries.size
+      if patient_summary_report.conditions.entries.size > 0
+        analysis_results["lab_results_present"] += 1
+      end
+      if patient_summary_report.conditions.num_coded_entries > 0
+        analysis_results["lab_results_coded"] += 1
+      end
+      if patient_summary_report.conditions.mu_coded_entries.size > 0
+        analysis_results["lab_results_mu_compliant"] += 1
+      end
     end
     if (patient_summary_report.immunizations)
-      analysis_results["immunizations_present"] +=      patient_summary_report.immunizations.entries.size
-      analysis_results["immunizations_coded"] +=        patient_summary_report.immunizations.num_coded_entries
-      analysis_results["immunizations_mu_compliant"] += patient_summary_report.immunizations.mu_coded_entries.size
+      if patient_summary_report.immunizations.entries.size > 0
+        analysis_results["immunizations_present"] += 1
+      end
+      if patient_summary_report.immunizations.num_coded_entries > 0
+        analysis_results["immunizations_coded"] += 1
+      end
+      if patient_summary_report.immunizations.mu_coded_entries.size > 0
+        analysis_results["immunizations_mu_compliant"] += 1
+      end
     end
     if (patient_summary_report.medications)
-      analysis_results["medications_present"] +=        patient_summary_report.medications.entries.size
-      analysis_results["medications_coded"] +=          patient_summary_report.medications.num_coded_entries
-      analysis_results["medications_mu_compliant"] +=   patient_summary_report.medications.mu_coded_entries.size
+      if patient_summary_report.medications.entries.size > 0
+        analysis_results["medications_present"] += 1
+      end
+      if patient_summary_report.medications.num_coded_entries > 0
+        analysis_results["medications_coded"] += 1
+      end
+      if patient_summary_report.medications.mu_coded_entries.size > 0
+        analysis_results["medications_mu_compliant"] += 1
+      end
     end
     if (patient_summary_report.procedures)
-        analysis_results["procedures_present"] +=       patient_summary_report.procedures.entries.size
-        analysis_results["procedures_coded"] +=         patient_summary_report.procedures.num_coded_entries
-        analysis_results["procedures_mu_compliant"] +=  patient_summary_report.procedures.mu_coded_entries.size
+      if patient_summary_report.procedures.entries.size > 0
+        analysis_results["procedures_present"] += 1
+      end
+      if patient_summary_report.procedures.num_coded_entries > 0
+        analysis_results["procedures_coded"] += 1
+      end
+      if patient_summary_report.procedures.mu_coded_entries.size > 0
+        analysis_results["procedures_mu_compliant"] += 1
+      end
     end
     if (patient_summary_report.procedures)
-        analysis_results["vital_signs_present"] +=      patient_summary_report.vital_signs.entries.size
-        analysis_results["vital_signs_coded"] +=        patient_summary_report.vital_signs.num_coded_entries
-        analysis_results["vital_signs_mu_compliant"] += patient_summary_report.vital_signs.mu_coded_entries.size
+      if patient_summary_report.vital_signs.entries.size > 0
+        analysis_results["vital_signs_present"] += 1
+      end
+      if patient_summary_report.vital_signs.num_coded_entries > 0
+        analysis_results["vital_signs_coded"] += 1
+      end
+      if patient_summary_report.vital_signs.mu_coded_entries.size > 0
+        analysis_results["vital_signs_mu_compliant"] += 1
+      end
     end
   end
 

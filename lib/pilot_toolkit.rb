@@ -9,11 +9,12 @@ require 'quality-measure-engine'
 require 'rexml/document'
 require 'uri'
 require 'net/http'
+require 'rest-client'
 
 require_relative 'validation/schematron_validator'
 require_relative 'validation/xml_schema_validator'
 require_relative 'validation/validator_registry'
-                  
+
 require_relative 'communication/uploader'
 require_relative 'stats/patient_summary_section'
 require_relative 'stats/patient_summary_report'

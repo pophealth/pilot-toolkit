@@ -42,13 +42,15 @@ module Stats
       psr = PatientSummaryReport.new
       pi = CCRscan::CCR.new
       patient_entry_hash = pi.create_ccr_hash(document)
-      STDERR.puts patient_entry_hash
+      #STDERR.puts patient_entry_hash
       patient_entry_hash.each_pair do |section, entry_list|
         pss = PatientSummarySection.new(section, @@mu_code_sets[section])
-        entry_list.each {|entry| pss.add_entry(entry)}
+        entry_list.each do |entry|
+          pss.add_entry(entry)
+        end
         psr.send("#{section}=", pss)
       end
-      psr
+      return psr
     end
 
     def dump

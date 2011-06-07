@@ -1,4 +1,5 @@
-<ContinuityOfCareRecord   :schemaLocation="urn:astm-org:CCR ADJE2369-2115.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<ContinuityOfCareRecord xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:astm-org:CCR ADJE2369-2115.xsd" xmlns="urn:astm-org:CCR">
   <CCRDocumentObjectID>20110124123221</CCRDocumentObjectID>
   <Language>
     <Text>English</Text>

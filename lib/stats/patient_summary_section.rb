@@ -43,6 +43,7 @@ module Stats
         outfp.puts "\tcodeset #{codeset}  values #{values.join(',')}"
       end
     end
+
   end
 
   class PatientSummarySection
@@ -98,7 +99,6 @@ module Stats
           uhash[desc] = {"count" => entry.count}
         end
       end
-
       unique_entries
     end
 

@@ -13,11 +13,15 @@ GIT
 GEM
   remote: http://rubygems.org/
   specs:
+    bouncy-castle-java (1.5.0146.1)
     bson (1.3.1)
     bson (1.3.1-java)
+    jruby-openssl (0.7.4)
+      bouncy-castle-java
     json (1.4.6)
     json (1.4.6-java)
     macaddr (1.0.0)
+    mime-types (1.16)
     mongo (1.3.1)
       bson (>= 1.3.1)
     nokogiri (1.4.4)
@@ -40,6 +44,8 @@ GEM
       redisk (>= 0.2.1)
       resque (>= 1.3.1)
       uuid (>= 2.0.2)
+    rest-client (1.6.3)
+      mime-types (>= 1.16)
     rubyzip (0.9.4)
     sinatra (1.2.6)
       rack (~> 1.1)
@@ -56,5 +62,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  jruby-openssl
   quality-measure-engine!
   rake
+  rest-client
