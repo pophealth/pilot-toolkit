@@ -6,6 +6,28 @@ require 'quality-measure-engine'
 # (meaningful use) coded, or alien (not the relevant code set for meaningful use clinical quality measures). 
 module Stats
 
+
+  class CodeSetValidator
+        @@ValidRegexp = {
+                "SNOMED-CT" => Regexp.new("\\d+"),
+                "ICD-9-CM"  => Regexp.new("^([EV])?\\d{3,3}(\\.\\d{1,2})?$"),
+                "ICD-10-CM" => Regexp.new("^[A-Z]\\d{2}(\\.\\d){0,1}$"),
+                "RxNorm" => Regexp.new("\\d+"),
+                "CPT" => Regexp.new("^\\d{4,4}[A-Z0-9]$"),
+                "LOINC" => Regexp.new("\\d+")
+        }
+     
+       def self.valid_code(codeset,value)
+        # if we can't validate, report valid
+         if !@@ValidRegexp[codeset]
+                return true
+         end
+         return (@@ValidRegexp[codeset] =~ value) == 0
+        
+
+       end
+  end
+
 # NEED TO ADD A + operator that merges the Codes hash?
 # get rid of subclass and just make a class with count, description and codes...much easier
   class StatsEntry < QME::Importer::Entry
@@ -59,6 +81,42 @@ module Stats
       @mu_code_systems = mu_code_systems
     end
     
+# Return a hash entry that includes a hash of entries with unique desciprions within this section
+# If there are no entries, the hash is empty.
+    def unique_mu_entries
+        # if there are no entries, return an empty hash
+        if(mu_coded_entries.size  == 0)
+                return {}
+        end
+        STDERR.puts "mu_coded = #{mu_coded_entries.size} "
+        unique_entries = { @name => { "mucodesystems" => @mu_code_systems,
+                                     "entries" => {}
+                                   }
+                          }
+        uhash = unique_entries[@name]["entries"]
+
+        mu_coded_entries.each do | entry |
+                sentry = Stats::StatsEntry.fromEntry(entry)
+               if(uhash[sentry.description])
+                uhash[sentry.description].add(sentry)
+               else
+                uhash[sentry.description] = sentry
+               end
+        end
+
+       uhash.each_pair do | desc, entry |
+         if(entry.codes.size > 0)
+                uhash[desc] = { "count" => entry.count,
+                                "codes" => entry.codes }
+         else
+                 uhash[desc] = { "count" => entry.count }
+         end
+          
+       end
+
+       return unique_entries
+    end
+
 # Return a hash entry that includes a hash of entries with unique desciprions within this section
 # If there are no entries, the hash is empty.
     def unique_non_mu_entries
@@ -168,12 +226,19 @@ module Stats
         @uncoded_entries << entry
       else
         entry.codes.each_pair do |codeset, values|
-          if @mu_code_systems.include?(codeset)
+         valid_code = false
+        values.each do | value |
+                valid_code |= Stats::CodeSetValidator.valid_code(codeset, value)
+        end
+        if(!valid_code)
+                @uncoded_entries << entry
+        else
+         if @mu_code_systems.include?(codeset)
             mu_code_found = true;
             @mu_code_systems_found[codeset] = true
-          else
+         else
             @alien_code_systems_found[codeset] = true
-          end
+         end
         end
         if mu_code_found
           @mu_coded_entries << entry    # If an entry has both mu codes and alien codes, it is classified as mu_coded
@@ -183,6 +248,7 @@ module Stats
       end
     end
   end
+end
 end
 
 # if launched as a standalone program, not loaded as a module

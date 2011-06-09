@@ -33,7 +33,7 @@ module Stats
     def self.from_c32(document)
       psr = PatientSummaryReport.new
       pi = QME::Importer::PatientImporter.instance
-      patient_entry_hash = pi.create_c32_hash(document)
+      patient_entry_hash = pi.create_c32_hash(document, true)
       patient_entry_hash.each_pair do |section, entry_list|
         pss = PatientSummarySection.new(section, @@mu_code_sets[section])
         entry_list.each do |entry| 
@@ -173,6 +173,44 @@ module Stats
 
    end
 
+   def unique_mu_entries
+        summary_hash = {}
+         if(@allergies) 
+            summary_hash.merge!(@allergies.unique_mu_entries)
+         end
+         if(@care_goals)
+                summary_hash.merge!(@care_goals.unique_mu_entries)
+         end
+         if(@conditions)
+                summary_hash.merge!(@conditions.unique_mu_entries)
+         end
+         if (@encounters)
+                summary_hash.merge!(@encounters.unique_mu_entries)
+         end
+         if (@immunizatons)
+                summary_hash.merge!(@immunizatons.unique_mu_entries)
+         end
+         if (@medical_equipment)
+                summary_hash.merge!(@medical_equipment.unique_mu_entries)
+         end
+         if (@medications)
+                summary_hash.merge!(@medications.unique_mu_entries)
+         end
+         if (@procedures)
+                summary_hash.merge!(@procedures.unique_mu_entries)
+          end
+        if (@results)
+                summary_hash.merge!(@results.unique_mu_entries)
+         end
+         if (@social_history)
+                summary_hash.merge!(@social_history.unique_mu_entries)
+         end
+         if (@vital_signs)
+                summary_hash.merge!(@vital_signs.unique_mu_entries)
+         end
+      return summary_hash
+
+   end
 
 end
 
