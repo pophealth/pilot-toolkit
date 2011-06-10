@@ -17,8 +17,10 @@ class PophealthImporterThread < Thread
           for i in (0..(files.length-1))
             @jframe.select_item(i)
             @jframe.update_text_areas
-            response = Communication::Uploader.upload("http://localhost:3000/records/create_from_c32",
-                                                      @jframe.get_file_list.get_selected_value.get_file.get_path)
+            #response = Communication::Uploader.upload("http://localhost:3000/records/create_from_c32",
+            #                                          @jframe.get_file_list.get_selected_value.get_file.get_path)
+            RestClient.post "http://pophealth:pophealth@localhost:3000/records", 
+                            :content => File.new(@jframe.get_file_list.get_selected_value.get_file.get_path)
           end
           @jframe.set_play_mode(false)
           @import_records = false
