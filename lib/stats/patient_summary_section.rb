@@ -224,6 +224,7 @@ module Stats
       @entries << entry
       if entry.codes.empty?
         @uncoded_entries << entry
+        STDERR.puts "======Uncoded entry==== #{entry.description}="
       else
         entry.codes.each_pair do |codeset, values|
          valid_code = false
@@ -232,7 +233,7 @@ module Stats
         end
         if(!valid_code || !entry.usable?)
                 if(!entry.usable?)
-                   STDERR.puts "======Unusable entry====="
+                   STDERR.puts "======Unusable entry====#{entry.description}=="
                 end
                 @uncoded_entries << entry
         else
