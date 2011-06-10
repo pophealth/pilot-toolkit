@@ -6,41 +6,30 @@
     require 'json'
 
 module C32Preprocessor
- class PatchVitals
+ class PatchCodes
 
-    def initialize
-      @loinc_to_snomed = {
-              "8462-4"  => {  "snomedcode" => 271650006,   "description" => "blood pressure, diastolic" },
-              "8480-6"  => {  "snomedcode" => 271649006,   "description" => "blood pressure, systolic" },
-              "8302-2"  => {  "snomedcode" => 248327008,   "description" => "height" },
-              "3141-9"  => {  "snomedcode" => 107647005,   "description" => "weight" },
-              "8867-4"  => {  "snomedcode" => 366199006,   "description" => "pulse rate" },
-              "9279-1"  => {  "snomedcode" => 366147009,   "description" => "respiratory rate" },
-              "8310-5"  => {  "snomedcode" => 309646008,   "description" => "temperature" },
-      }
-    end
-
-# process_doc
+ # process_doc
 # input is Nokogiri document
-  def process_doc(doc)
+  def self.process_doc(doc, map)
 
     vital_signs_entrys = doc.xpath("//cda:observation[cda:templateId/@root='2.16.840.1.113883.3.88.11.83.14']")
     vital_signs_entrys.each do |entry|
         code_elements = entry.xpath("./cda:code")
         code_elements.each do |code_element|
                 code = code_element['code']
-                codesystem = code_element['codeSystem']
+                codesystem = code_element['codeSystemName']
                 d = code_element['codeSystem']
-                l = @loinc_to_snomed[code]
-               STDERR.puts "code system #{codesystem} and code #{code }"
-                if(codesystem == "2.16.840.1.113883.6.1" and l)   # LOINC Code, and we have a translation
-                         displayName = l['description']
-                         snomedcode = l['snomedcode']
+                l = map["vital_signs"][[codesystem,code]]
+#               STDERR.puts "code system #{codesystem} and code #{code } l = #{l}"
+                if(l)   # LOINC Code, and we have a translation
+                         displayName = l[2]
+                         code = l[1]
+                         new_code_system = l[0]
                   Nokogiri::XML::Builder.with(code_element) do |xml|
                         xml.translation(:displayName => displayName, 
-                                        :codeSystemName => "SNOMEDCT", 
-                                        :codeSystem => "2.16.840.1.113883.6.96", 
-                                        :code => snomedcode)
+                                        :codeSystemName => new_code_system, 
+                                        :codeSystem => "2.16.840.1.113883.6.96",  # this will need to be a table lookup, or included in the code_to_code_mapping
+                                        :code => code)
                   end
                 end
          end
@@ -55,11 +44,27 @@ end
 
 # if launched as a standalone program, not loaded as a module
 if __FILE__ == $0
-
+   require 'nokogiri'
+   require 'json'
    if ARGV.size < 2
      STDERR.puts "jruby vitals_to_snomed.rb <indir> <outdir>"
      exit
    end
+
+   map = {
+      "vital_signs" =>  {
+         ["LOINC", "8462-4"]  => ["SNOMEDCT", "271650006", "blood pressure, diastolic"],
+         ["LOINC", "8480-6"]  => ["SNOMEDCT", "271649006", "blood pressure, systolic"],
+         ["LOINC", "8302-2"]  => ["SNOMEDCT", "248327008", "height"],
+         ["LOINC", "3141-9"]  => ["SNOMEDCT", "107647005", "weight"],
+         ["LOINC", "8867-4"]  => ["SNOMEDCT", "366199006", "pulse rate"],
+         ["LOINC", "9279-1"]  => ["SNOMEDCT", "366147009", "respiratory rate"],
+         ["LOINC", "8310-5"]  => ["SNOMEDCT", "309646008", "temperature"]  
+         },
+       "medications" =>  {
+           ["Multum", "12345"]  => ["RxNorm",  "1234", "aspirin"]
+         }
+     }
 
    indir = ARGV[0]
    outdir = ARGV[1]
@@ -70,13 +75,13 @@ if __FILE__ == $0
     Dir.glob("#{indir}/*.{xml,XML}") do |item|
         infilename = File.basename(item) 
        STDERR.puts infilename
-        patcher = C32Preprocessor::PatchVitals.new
+
         outfilefp = File.open("#{outdir}/#{infilename}","w")
         infilefp = File.open(item,"r")
         STDERR.puts "Processing #{item}"
        doc = Nokogiri::XML(infilefp) 
        doc.root.add_namespace_definition('cda', 'urn:hl7-org:v3')
-       patcher.process_doc(doc)
+       C32Preprocessor::PatchCodes.process_doc(doc,map)
        outfilefp.puts doc.to_xml
        outfilefp.close
      end 
