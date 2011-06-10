@@ -5,32 +5,27 @@ require 'quality-measure-engine'
 # (meaningful use) coded, or alien (not the relevant code set for meaningful use clinical quality measures).
 module Stats
 
-
   class CodeSetValidator
-        @@ValidRegexp = {
-                "SNOMED-CT" => Regexp.new("\\d+"),
-                "ICD-9-CM"  => Regexp.new("^([EV])?\\d{3,3}(\\.\\d{1,2})?$"),
-                "ICD-10-CM" => Regexp.new("^[A-Z]\\d{2}(\\.\\d){0,1}$"),
-                "RxNorm" => Regexp.new("\\d+"),
-                "CPT" => Regexp.new("^\\d{4,4}[A-Z0-9]$"),
-                "LOINC" => Regexp.new("\\d+")
-        }
-     
-       def self.valid_code(codeset,value)
-         # make sure value is a string
-        # if we can't validate, report valid
-         if !@@ValidRegexp[codeset]
-                 return true
-         else
-           return (@@ValidRegexp[codeset] =~ value) == 0
-         end
-        
 
-       end
+    @@ValidRegexp = {
+      "SNOMED-CT" => Regexp.new("\\d+"),
+      "ICD-9-CM"  => Regexp.new("^([EV])?\\d{3,3}(\\.\\d{1,2})?$"),
+      "ICD-10-CM" => Regexp.new("^[A-Z]\\d{2}(\\.\\d){0,1}$"),
+      "RxNorm" => Regexp.new("\\d+"),
+      "CPT" => Regexp.new("^\\d{4,4}[A-Z0-9]$"),
+      "LOINC" => Regexp.new("\\d+")
+    }
+
+    def self.valid_code(codeset,value)
+      # make sure value is a string
+      # if we can't validate, report valid
+      if !@@ValidRegexp[codeset]
+        return true
+      else
+        return (@@ValidRegexp[codeset] =~ value) == 0
+      end
+    end
   end
-
-# NEED TO ADD A + operator that merges the Codes hash?
-# get rid of subclass and just make a class with count, description and codes...much easier
 
   class StatsEntry < QME::Importer::Entry
 
@@ -85,54 +80,55 @@ module Stats
       @alien_coded_entries = []
       @mu_code_systems = mu_code_systems
     end
-    
-# Return a hash entry that includes a hash of entries with unique desciprions within this section
-# If there are no entries, the hash is empty.
+
     def unique_mu_entries
-        # if there are no entries, return an empty hash
-        if(mu_coded_entries.size  == 0)
-                return {}
+      # if there are no entries, return an empty hash
+      if(mu_coded_entries.size  == 0)
+        return {}
+      end
+      STDERR.puts "mu_coded = #{mu_coded_entries.size} "
+      unique_entries = { 
+        @name => { 
+          "mucodesystems" => @mu_code_systems,
+          "entries" => {}
+        }
+      }
+      uhash = unique_entries[@name]["entries"]
+      mu_coded_entries.each do |entry|
+        sentry = Stats::StatsEntry.fromEntry(entry)
+        if(uhash[sentry.description])
+          uhash[sentry.description].add(sentry)
+        else
+          uhash[sentry.description] = sentry
         end
-        STDERR.puts "mu_coded = #{mu_coded_entries.size} "
-        unique_entries = { @name => { "mucodesystems" => @mu_code_systems,
-                                     "entries" => {}
-                                   }
-                          }
-        uhash = unique_entries[@name]["entries"]
+      end
 
-        mu_coded_entries.each do | entry |
-                sentry = Stats::StatsEntry.fromEntry(entry)
-               if(uhash[sentry.description])
-                uhash[sentry.description].add(sentry)
-               else
-                uhash[sentry.description] = sentry
-               end
+      uhash.each_pair do | desc, entry |
+        if(entry.codes.size > 0)
+          uhash[desc] = 
+          {
+            "count" => entry.count,
+            "codes" => entry.codes
+          }
+        else
+          uhash[desc] = { "count" => entry.count }
         end
-
-       uhash.each_pair do | desc, entry |
-         if(entry.codes.size > 0)
-                uhash[desc] = { "count" => entry.count,
-                                "codes" => entry.codes }
-         else
-                 uhash[desc] = { "count" => entry.count }
-         end
-          
-       end
-
-       return unique_entries
+      end
+      unique_entries
     end
 
-# Return a hash entry that includes a hash of entries with unique desciprions within this section
-# If there are no entries, the hash is empty.
-
     def unique_non_mu_entries
-
       # if there are no entries, return an empty hash
       if(uncoded_entries.size + alien_coded_entries.size == 0)
         return {}
       end
 
-      unique_entries = {@name => { "mucodesystems" => @mu_code_systems, "entries" => {} } }
+      unique_entries = {
+        @name => {
+          "mucodesystems" => @mu_code_systems,
+          "entries" => {}
+        }
+      }
       uhash = unique_entries[@name]["entries"]
 
       uncoded_entries.each do |entry|
@@ -164,13 +160,17 @@ module Stats
     end
 
     def summary
-      results = { @name => { "entries" =>                     num_coded_entries + num_uncoded_entries,
-                             "mu code systems" =>             @mu_code_systems,
-                             "coded entries" =>               num_coded_entries,
-                             "mu coded entries" =>            num_mu_coded_entries,
-                             "mu code systems in use" =>      mu_code_systems_found,
-                             "non-mu coded entries" =>        num_alien_coded_entries,
-                             "non-mu code systems in use" =>  alien_code_systems_found} }
+      results = { 
+        @name => {
+          "entries" =>                     num_coded_entries + num_uncoded_entries,
+          "mu code systems" =>             @mu_code_systems,
+          "coded entries" =>               num_coded_entries,
+          "mu coded entries" =>            num_mu_coded_entries,
+          "mu code systems in use" =>      mu_code_systems_found,
+          "non-mu coded entries" =>        num_alien_coded_entries,
+          "non-mu code systems in use" =>  alien_code_systems_found
+        }
+      }
     end
 
     def dump(outfp)
@@ -216,32 +216,29 @@ module Stats
       mu_code_found = false
       valid_code_found = false
       @entries << entry
-        entry.codes.each_pair do |codeset, values|
-         valid_code = false
-         values.each do | value |   # Is there a valid code for this codeset
-#           v = (Stats::CodeSetValidator.valid_code(codeset, value) && entry.usable?)
-           v = (Stats::CodeSetValidator.valid_code(codeset, value) )
-                 valid_code = valid_code || v
+      entry.codes.each_pair do |codeset, values|
+        valid_code = false
+        values.each do | value |   # Is there a valid code for this codeset
+          #v = (Stats::CodeSetValidator.valid_code(codeset, value) && entry.usable?)
+          v = (Stats::CodeSetValidator.valid_code(codeset, value) )
+          valid_code = valid_code || v
+        end
+        # Timestamp code breaks CCR test cases, since we don't yet capture timestamps there
+        # if(!valid_code || !entry.usable?)   #If we've not seen a valid code or there is a timestamp
+        if(!valid_code)
+          STDERR.puts "Entry is not usable due to invalid code or lack of timestamp"
+        else #otherwise, is it an appropriate code set?
+          valid_code_found = true
+          if @mu_code_systems.include?(codeset)
+            mu_code_found = true;
+            @mu_code_systems_found[codeset] = true
+          else
+            @alien_code_systems_found[codeset] = true
           end
- # TImestamp code breaks CCR test cases, since we don't yet capture timestamps there
- #        if(!valid_code || !entry.usable?)   #If we've not seen a valid code or there is a timestamp
-          if(!valid_code)
-                STDERR.puts "Entry is not usable due to invalid code or lack of timestamp"
-#               if(!entry.usable?)
-#                  STDERR.puts "======Unusable entry====#{entry.description}=="
-#                end
-         else     #otherwise, is it an appropriate code set?
-           valid_code_found = true
-           if @mu_code_systems.include?(codeset)
-             mu_code_found = true;
-             @mu_code_systems_found[codeset] = true
-           else
-             @alien_code_systems_found[codeset] = true
-           end
-          end
-         end 
+        end
+      end 
       if !valid_code_found
-           @uncoded_entries << entry
+        @uncoded_entries << entry
       else
         if mu_code_found
           @mu_coded_entries << entry    # If an entry has both mu codes and alien codes, it is classified as mu_coded
@@ -249,10 +246,8 @@ module Stats
           @alien_coded_entries << entry # contains only non-mu codes
         end
       end
- 
+    end
   end
-  
-end
 end
 
 # if launched as a standalone program, not loaded as a module
