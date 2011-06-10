@@ -17,11 +17,13 @@ module Stats
         }
      
        def self.valid_code(codeset,value)
+         # make sure value is a string
         # if we can't validate, report valid
          if !@@ValidRegexp[codeset]
-                return true
+                 return true
+         else
+           return (@@ValidRegexp[codeset] =~ value) == 0
          end
-         return (@@ValidRegexp[codeset] =~ value) == 0
         
 
        end
@@ -212,37 +214,44 @@ module Stats
 
     def add_entry(entry)
       mu_code_found = false
+      valid_code_found = false
       @entries << entry
-      if entry.codes.empty?
-        @uncoded_entries << entry
-        STDERR.puts "======Uncoded entry==== #{entry.description}="
-      else
         entry.codes.each_pair do |codeset, values|
          valid_code = false
-        values.each do | value |
-                valid_code |= (Stats::CodeSetValidator.valid_code(codeset, value) && entry.usable?)
-        end
-        if(!valid_code || !entry.usable?)
-                if(!entry.usable?)
-                   STDERR.puts "======Unusable entry====#{entry.description}=="
-                end
-                @uncoded_entries << entry
-        else
-         if @mu_code_systems.include?(codeset)
-            mu_code_found = true;
-            @mu_code_systems_found[codeset] = true
-         else
-            @alien_code_systems_found[codeset] = true
-         end
-        end
+         values.each do | value |   # Is there a valid code for this codeset
+#           v = (Stats::CodeSetValidator.valid_code(codeset, value) && entry.usable?)
+           v = (Stats::CodeSetValidator.valid_code(codeset, value) )
+                 valid_code = valid_code || v
+          end
+ # TImestamp code breaks CCR test cases, since we don't yet capture timestamps there
+ #        if(!valid_code || !entry.usable?)   #If we've not seen a valid code or there is a timestamp
+          if(!valid_code)
+                STDERR.puts "Entry is not usable due to invalid code or lack of timestamp"
+#               if(!entry.usable?)
+#                  STDERR.puts "======Unusable entry====#{entry.description}=="
+#                end
+         else     #otherwise, is it an appropriate code set?
+           valid_code_found = true
+           if @mu_code_systems.include?(codeset)
+             mu_code_found = true;
+             @mu_code_systems_found[codeset] = true
+           else
+             @alien_code_systems_found[codeset] = true
+           end
+          end
+         end 
+      if !valid_code_found
+           @uncoded_entries << entry
+      else
         if mu_code_found
           @mu_coded_entries << entry    # If an entry has both mu codes and alien codes, it is classified as mu_coded
         else
           @alien_coded_entries << entry # contains only non-mu codes
         end
       end
-    end
+ 
   end
+  
 end
 end
 
