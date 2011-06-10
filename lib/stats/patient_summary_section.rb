@@ -228,9 +228,12 @@ module Stats
         entry.codes.each_pair do |codeset, values|
          valid_code = false
         values.each do | value |
-                valid_code |= Stats::CodeSetValidator.valid_code(codeset, value)
+                valid_code |= (Stats::CodeSetValidator.valid_code(codeset, value) && entry.usable?)
         end
-        if(!valid_code)
+        if(!valid_code || !entry.usable?)
+                if(!entry.usable?)
+                   STDERR.puts "======Unusable entry====="
+                end
                 @uncoded_entries << entry
         else
          if @mu_code_systems.include?(codeset)
