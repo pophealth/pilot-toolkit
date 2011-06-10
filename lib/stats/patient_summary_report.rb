@@ -27,7 +27,8 @@ module Stats
     def self.from_c32(document)
       psr = PatientSummaryReport.new
       pi = QME::Importer::PatientImporter.instance
-      patient_entry_hash = pi.create_c32_hash(document, false)
+      #patient_entry_hash = pi.create_c32_hash(document, false)
+      patient_entry_hash = pi.create_c32_hash(document)
       patient_entry_hash.each_pair do |section, entry_list|
         pss = PatientSummarySection.new(section, @@mu_code_sets[section])
         entry_list.each do |entry|

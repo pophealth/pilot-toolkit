@@ -1,6 +1,6 @@
 GIT
-  remote: http://github.com/saulkravitz/quality-measure-engine.git
-  revision: a2a7c6ebf60f1c91a574dffb816ab82f2c3ee01d
+  remote: http://github.com/pophealth/quality-measure-engine.git
+  revision: 20d63dcca8bd36c28de6ae3e279a19f1ac4695f8
   branch: develop
   specs:
     quality-measure-engine (0.8.1)
