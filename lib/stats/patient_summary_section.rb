@@ -9,7 +9,7 @@ module Stats
 
     @@ValidRegexp = {
       "SNOMED-CT" => Regexp.new("\\d+"),
-      "ICD-9-CM"  => Regexp.new("^([EV])?\\d{3,3}(\\.\\d{1,2})?$"),
+      "ICD-9-CM"  => Regexp.new("^([EV])?\\d{2,3}(\\.\\d{1,2})?$"),
       "ICD-10-CM" => Regexp.new("^[A-Z]\\d{2}(\\.\\d){0,1}$"),
       "RxNorm" => Regexp.new("\\d+"),
       "CPT" => Regexp.new("^\\d{4,4}[A-Z0-9]$"),

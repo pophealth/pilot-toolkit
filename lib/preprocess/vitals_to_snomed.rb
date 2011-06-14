@@ -5,40 +5,133 @@
    require 'nokogiri'
     require 'json'
 
+
+#Need to do this like the importer...have a list of sections, with entry XPaths, code XPaths, and description XPaths
+#@section_importers[:results] = SectionImporter.new("//cda:observation[cda:templateId/@root='2.16.840.1.113883.3.88.11.83.15.1'] | //cda:observation[cda:templateId/@root='2.16.840.1.113883.3.88.11.83.15']")
+#@section_importers[:vital_signs] = SectionImporter.new("//cda:observation[cda:templateId/@root='2.16.840.1.113883.3.88.11.83.14']")
+#def initialize(entry_xpath, code_xpath="./cda:code", status_xpath=nil, description_xpath="./cda:code/cda:originalText/cda:reference[@value] | ./cda:text/cda:reference[@value] ")
+
 module C32Preprocessor
- class PatchCodes
-
- # process_doc
-# input is Nokogiri document
-  def self.process_doc(doc, map)
-
-    vital_signs_entrys = doc.xpath("//cda:observation[cda:templateId/@root='2.16.840.1.113883.3.88.11.83.14']")
-    vital_signs_entrys.each do |entry|
-        code_elements = entry.xpath("./cda:code")
-        code_elements.each do |code_element|
-                code = code_element['code']
-                codesystem = code_element['codeSystemName']
-                d = code_element['codeSystem']
-                l = map["vital_signs"][[codesystem,code]]
-#               STDERR.puts "code system #{codesystem} and code #{code } l = #{l}"
-                if(l)   # LOINC Code, and we have a translation
-                         displayName = l[2]
-                         code = l[1]
-                         new_code_system = l[0]
-                  Nokogiri::XML::Builder.with(code_element) do |xml|
-                        xml.translation(:displayName => displayName, 
-                                        :codeSystemName => new_code_system, 
-                                        :codeSystem => "2.16.840.1.113883.6.96",  # this will need to be a table lookup, or included in the code_to_code_mapping
-                                        :code => code)
-                  end
-                end
-         end
-     end
-
-
+  class PatchCodesDocument
+    def initialize (doc,map)
+      @doc = doc
+      @map = map
+      build_id_map
+      @vitals_section = C32Preprocessor::PatchCodesSection.new(doc, "vital_signs",map["vital_signs"], @id_map, "//cda:observation[cda:templateId/@root='2.16.840.1.113883.3.88.11.83.14']")
+      @results_section = C32Preprocessor::PatchCodesSection.new(doc, "results", map["results"], @id_map,"//cda:observation[cda:templateId/@root='2.16.840.1.113883.3.88.11.83.15.1'] | //cda:observation[cda:templateId/@root='2.16.840.1.113883.3.88.11.83.15']")
+      
+    end
+    # process
+    # input is Nokogiri document
+    def process
+      @vitals_section.process
+      @results_section.process
+    end
+    def build_id_map
+      @id_map = {}
+      path = "//*[@ID]"
+      ids = @doc.xpath(path)
+      ids.each do |id|
+        tag = id['ID']
+        value = id.content
+#        STDERR.puts "tag = #{tag} value = #{value}"
+        @id_map[tag] = value
+      end
+    end
+    
   end
+ class PatchCodesSection
+   def initialize(doc, section, map, id_map, entry_xpath, code_xpath= "./cda:code", description_xpath = "./cda:code/cda:originalText/cda:reference[@value] | ./cda:text/cda:reference[@value] ")
+     @doc = doc
+     @section = section
+     @map = map
+     @id_map = id_map
+     @entry_xpath = entry_xpath
+     @code_xpath = code_xpath
+     @description_xpath = description_xpath
+   end
+   def lookup_tag(tag)
+     value = @id_map[tag]
+     # Not sure why, but sometimes the reference is #<Reference> and the ID value is <Reference>, and 
+     # sometimes it is #<Reference>.  We look for both.
+     if !value and tag[0] == '#'  
+       tag = tag[1,tag.length]
+       value = @id_map[tag]
+     end
+     return value
+   end
 
- end
+
+   def add_translate_block(code_element, code, display_name, code_system)
+     code_system_oid = QME::Importer::CodeSystemHelper.oid_for_code_system(code_system)
+#     STDERR.puts "add_translate_block code_system = #{code_system} code_system_oid: #{code_system_oid} code_system_oid.size"
+     Nokogiri::XML::Builder.with(code_element) do |xml|
+       xml.translation(:display_name => display_name,
+       :codeSystemName => code_system,
+       :codeSystem => code_system_oid,
+       :code => code)
+     end
+   end
+   
+   
+    def add_code_translations(code_element)
+
+     code = code_element['code']
+     codesystem = code_element['codeSystemName']
+     d = code_element['codeSystem']
+#     STDERR.puts "add_code_translations section = #{@section} codesystem #{codesystem} code #{code}"
+     if(!@map || !@map[codesystem])
+        return
+      end
+     l = @map[codesystem][code]
+#     STDERR.puts "l = #{l}"
+     if(l) # If there is a translation, add a translate block
+       l.each do | translation |
+         add_translate_block(code_element,translation[1], translation[2], translation[0])
+        end
+     end
+   end
+
+   def add_codes(entry, description)
+       if !@map || !@map["FREE-TEXT"]
+         return
+       end
+       tag = description[0]['value']
+       value = lookup_tag(tag)
+       # OK, now we have the description.   Let's look it up.
+       l = @map["FREE-TEXT"][value]
+       code_element = entry.at_xpath(@code_xpath)
+       if(l and code_element)
+         # If there is a code block, add a translate block
+         # If it doesn't exist, punt
+         l.each do | translation |
+#           STDERR.puts "translation = #{translation.join(',')}"
+             add_translate_block(code_element,translation[1], translation[2], translation[0])
+         end  
+       end
+     end
+   
+     def process
+       if(!@map)  # if there are no translations for this section, we are done
+         return
+       end
+#       STDERR.puts "sectionName:   #{@sectionName} xpath: #{@entry_xpath}"
+       entries = @doc.xpath(@entry_xpath)
+ #      STDERR.puts "Found #{entries.size} elements"
+       entries.each do | entry|
+         description = entry.xpath(@description_xpath)
+#         STDERR.puts "@description_xpath = #{@description_xpath} description = #{description} codes_xpath = #{@code_xpath}"
+         codes = entry.xpath(@code_xpath)
+#         STDERR.puts "codes size = #{codes.size}"
+         codes.each do |code|
+#           STDERR.puts code
+           add_code_translations(code)
+         end
+         add_codes(entry, description)   #see if we can translate from the free text
+       end
+     end
+ 
+end
 end
 
 
@@ -46,31 +139,21 @@ end
 if __FILE__ == $0
    require 'nokogiri'
    require 'json'
-   if ARGV.size < 2
-     STDERR.puts "jruby vitals_to_snomed.rb <indir> <outdir>"
+   require 'qme/importer/code_system_helper'
+   if ARGV.size < 3
+     STDERR.puts "jruby vitals_to_snomed.rb <indir> <outdir> map.json"
      exit
    end
 
-   map = {
-      "vital_signs" =>  {
-         ["LOINC", "8462-4"]  => ["SNOMEDCT", "271650006", "blood pressure, diastolic"],
-         ["LOINC", "8480-6"]  => ["SNOMEDCT", "271649006", "blood pressure, systolic"],
-         ["LOINC", "8302-2"]  => ["SNOMEDCT", "248327008", "height"],
-         ["LOINC", "3141-9"]  => ["SNOMEDCT", "107647005", "weight"],
-         ["LOINC", "8867-4"]  => ["SNOMEDCT", "366199006", "pulse rate"],
-         ["LOINC", "9279-1"]  => ["SNOMEDCT", "366147009", "respiratory rate"],
-         ["LOINC", "8310-5"]  => ["SNOMEDCT", "309646008", "temperature"]  
-         },
-       "medications" =>  {
-           ["Multum", "12345"]  => ["RxNorm",  "1234", "aspirin"]
-         }
-     }
-
    indir = ARGV[0]
    outdir = ARGV[1]
+   mapjson = ARGV[2]
 
-  STDERR.puts "Opening #{indir} for read"
-   STDERR.puts "Opening #{outdir} for write" 
+  STDERR.puts "Opening #{indir} for read directory"
+    STDERR.puts "Opening #{mapjson} for map"
+   STDERR.puts "Opening #{outdir} for write directory" 
+   
+   map = JSON.parse(File.open(mapjson).read)
 
     Dir.glob("#{indir}/*.{xml,XML}") do |item|
         infilename = File.basename(item) 
@@ -81,7 +164,8 @@ if __FILE__ == $0
         STDERR.puts "Processing #{item}"
        doc = Nokogiri::XML(infilefp) 
        doc.root.add_namespace_definition('cda', 'urn:hl7-org:v3')
-       C32Preprocessor::PatchCodes.process_doc(doc,map)
+       patch_doc = C32Preprocessor::PatchCodesDocument.new(doc,map)
+       patch_doc.process
        outfilefp.puts doc.to_xml
        outfilefp.close
      end 
