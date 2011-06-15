@@ -1,0 +1,92 @@
+{
+    "vital_signs": {
+        "LOINC": {
+            "8462-4": [
+                [
+                    "SNOMED-CT",
+                    "271650006",
+                    "blood pressure, diastolic"
+                ],
+                [
+                    "SNOMED_CT",
+                    "XXXXXXXXXX",
+                    "schmeggege"
+                ]
+            ],
+            "8480-6": [
+                [
+                    "SNOMED-CT",
+                    "248327008",
+                    "blood pressure, systolic"
+                ]
+            ],
+            "8302-2": [
+                [
+                    "SNOMED-CT",
+                    "248327008",
+                    "height"
+                ],
+                [
+                    "SNOMED_CT",
+                    "XXXXXXXXXX",
+                    "schmeggege"
+                ]
+            ],
+            "3141-9": [
+                [
+                    "SNOMED-CT",
+                    "271650006",
+                    "weight"
+                ]
+            ],
+            "8867-4": [
+                [
+                    "SNOMED-CT",
+                    "366199006",
+                    "pulse rate"
+                ]
+            ],
+            "9279-1": [
+                [
+                    "SNOMED-CT",
+                    "366147009",
+                    "respiratory rate"
+                ]
+            ],
+            "8310-5": [
+                [
+                    "SNOMED-CT",
+                    "309646008",
+                    "temperature"
+                ]
+            ]
+        }
+    },
+    "results": {
+        "FREE-TEXT": {
+            "HDL cholesterol, serum": [
+                [
+                    "CPT",
+                    "83701",
+                    "HDL cholesterol, serum"
+                ],
+                [
+                    "LOINC",
+                    " 2085-9",
+                    "HDL cholesterol, serum"
+                ],
+                [
+                    "SNOMED-CT",
+                    "121792008,",
+                    "HDL cholesterol, serum"
+                ]
+            ],
+			"blood glucose, random": [
+			[
+				"LOINC",
+				"11111",
+				"blood glucose, random"]
+				]
+        }
+    }
+}
