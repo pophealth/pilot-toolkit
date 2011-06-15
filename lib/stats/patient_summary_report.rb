@@ -4,9 +4,6 @@ module Stats
   # and ASTM CCR documents that are to be input to popHealth
   class PatientSummaryReport
 
-    attr_accessor :allergies, :care_goals, :conditions, :encounters, :immunizations, :medical_equipment,
-                  :medications, :procedures, :results, :social_history, :vital_signs
-
     # Each section is initialized with the appropriate meaningful use (MU) coding systems
     def initialize
       # Initialize the sections of the Patient Summary
@@ -22,8 +19,20 @@ module Stats
       @@mu_code_sets[:results] = ["LOINC","SNOMED-CT"]
       @@mu_code_sets[:social_history] = ["SNOMED-CT"]
       @@mu_code_sets[:vital_signs] = ["ICD-9-CM","ICD-10-CM","SNOMED-CT"]
+      
+      @sections = {}
    end
-
+   
+   def add_section(section, pss)
+     @sections[section] = pss
+     self.class.class_eval do
+      define_method(section){ @sections[section] }
+     end
+    end
+   
+    # from_c32:  read a Nokogiri::Document, and leverage the QME patient importer to create
+    # a hash of entries broken down by section.   Pass these through the PatientSummarySection analysis
+    # @param [Nokogiri::Document]   source document
     def self.from_c32(document)
       psr = PatientSummaryReport.new
       pi = QME::Importer::PatientImporter.instance
@@ -31,14 +40,17 @@ module Stats
       patient_entry_hash = pi.create_c32_hash(document)
       patient_entry_hash.each_pair do |section, entry_list|
         pss = PatientSummarySection.new(section, @@mu_code_sets[section])
-        entry_list.each do |entry|
+        entry_list.each do |entry|   #transfer the entries.   Could this be a simple array assignment?
           pss.add_entry(entry)
         end
-        psr.send("#{section}=", pss)
+        psr.add_section(section, pss)
       end
       psr
     end
 
+    # from_c32:  read a Nokogiri::Document, and leverage the CCRScan::CCR to build a hash just like the one created by
+    # QME patient importer, a hash of entries broken down by section.   Pass these through the PatientSummarySection analysis
+    # @param [Nokogiri::Document]   source document
     def self.from_ccr(document)
       psr = PatientSummaryReport.new
       pi = CCRscan::CCR.new
@@ -49,161 +61,40 @@ module Stats
         entry_list.each do |entry|
           pss.add_entry(entry)
         end
-        psr.send("#{section}=", pss)
+        psr.add_section(section, pss)
       end
       return psr
     end
 
     def dump
-      if(@allergies)
-         @allergies.dump(STDERR)
-      end
-      if(@care_goals)
-        @care_goals.dump(STDERR)
-      end
-      if(@conditions)
-        @conditions.dump(STDERR)
-      end
-      if (@encounters)
-        @encounters.dump(STDERR)
-      end
-      if (@immunizatons)
-        @immunizatons.dump(STDERR)
-      end
-      if (@medical_equipment)
-        @medical_equipment.dump(STDERR)
-      end
-      if (@medications)
-        @medications.dump(STDERR)
-      end
-      if (@procedures)
-        @procedures.dump(STDERR)
-      end
-      if (@results)
-        @results.dump(STDERR)
-      end
-      if (@social_history)
-        @social_history.dump(STDERR)
-      end
-      if (@vital_signs)
-        @vital_signs.dump(STDERR)
+      @sections.each_pair do |section,pss|
+        pss.dump(STDERR)
       end
     end
 
     def summary
       summary_hash = {}
-      if(@allergies) 
-        summary_hash.merge!(@allergies.summary)
-      end
-      if(@care_goals)
-        summary_hash.merge!(@care_goals.summary)
-      end
-      if(@conditions)
-        summary_hash.merge!(@conditions.summary)
-      end
-      if (@encounters)
-        summary_hash.merge!(@encounters.summary)
-      end
-      if (@immunizatons)
-        summary_hash.merge!(@immunizatons.summary)
-      end
-      if (@medical_equipment)
-        summary_hash.merge!(@medical_equipment.summary)
-      end
-      if (@medications)
-        summary_hash.merge!(@medications.summary)
-      end
-      if (@procedures)
-        summary_hash.merge!(@procedures.summary)
-      end
-      if (@results)
-        summary_hash.merge!(@results.summary)
-      end
-      if (@social_history)
-        summary_hash.merge!(@social_history.summary)
-      end
-      if (@vital_signs)
-        summary_hash.merge!(@vital_signs.summary)
-      end
+      @sections.each_pair do |section,pss|
+         summary_hash.merge!(pss.summary)
+       end
       summary_hash
     end
 
    def unique_mu_entries
         summary_hash = {}
-         if(@allergies) 
-            summary_hash.merge!(@allergies.unique_mu_entries)
+        @sections.each_pair do |section,pss|
+           summary_hash.merge!(pss.unique_mu_entries)
          end
-         if(@care_goals)
-                summary_hash.merge!(@care_goals.unique_mu_entries)
-         end
-         if(@conditions)
-                summary_hash.merge!(@conditions.unique_mu_entries)
-         end
-         if (@encounters)
-                summary_hash.merge!(@encounters.unique_mu_entries)
-         end
-         if (@immunizatons)
-                summary_hash.merge!(@immunizatons.unique_mu_entries)
-         end
-         if (@medical_equipment)
-                summary_hash.merge!(@medical_equipment.unique_mu_entries)
-         end
-         if (@medications)
-                summary_hash.merge!(@medications.unique_mu_entries)
-         end
-         if (@procedures)
-                summary_hash.merge!(@procedures.unique_mu_entries)
-          end
-        if (@results)
-                summary_hash.merge!(@results.unique_mu_entries)
-         end
-         if (@social_history)
-                summary_hash.merge!(@social_history.unique_mu_entries)
-         end
-         if (@vital_signs)
-                summary_hash.merge!(@vital_signs.unique_mu_entries)
-         end
-      return summary_hash
-
+       return summary_hash
    end
 
-    def unique_non_mu_entries
-      summary_hash = {}
-      if(@allergies) 
-        summary_hash.merge!(@allergies.unique_non_mu_entries)
-      end
-      if(@care_goals)
-        summary_hash.merge!(@care_goals.unique_non_mu_entries)
-      end
-      if(@conditions)
-        summary_hash.merge!(@conditions.unique_non_mu_entries)
-      end
-      if (@encounters)
-        summary_hash.merge!(@encounters.unique_non_mu_entries)
-      end
-      if (@immunizatons)
-        summary_hash.merge!(@immunizatons.unique_non_mu_entries)
-      end
-      if (@medical_equipment)
-        summary_hash.merge!(@medical_equipment.unique_non_mu_entries)
-      end
-      if (@medications)
-        summary_hash.merge!(@medications.unique_non_mu_entries)
-      end
-      if (@procedures)
-        summary_hash.merge!(@procedures.unique_non_mu_entries)
-      end
-      if (@results)
-        summary_hash.merge!(@results.unique_non_mu_entries)
-      end
-      if (@social_history)
-        summary_hash.merge!(@social_history.unique_non_mu_entries)
-      end
-      if (@vital_signs)
-        summary_hash.merge!(@vital_signs.unique_non_mu_entries)
-      end
-      summary_hash
-    end
+   def unique_non_mu_entries
+        summary_hash = {}
+        @sections.each_pair do |section,pss|
+           summary_hash.merge!(pss.unique_non_mu_entries)
+         end
+       return summary_hash
+   end
 
   end
 

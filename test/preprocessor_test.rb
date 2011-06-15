@@ -29,6 +29,8 @@ class PatientSummaryReportTest < Test::Unit::TestCase
     # Validate the patched XML
     results = validator.validate(c32)
     assert results
+    doc = Nokogiri::XML(c32)
+    doc.root.add_namespace_definition('cda', 'urn:hl7-org:v3')
     # Run a patient summary report, and verify that things actually changed.
     psr2 = Stats::PatientSummaryReport.from_c32(doc)
     STDERR.puts psr2.results.entries.size
