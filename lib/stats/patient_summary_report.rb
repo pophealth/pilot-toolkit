@@ -3,7 +3,7 @@ module Stats
   # PatientSummaryReport is used to capture an assesment of coded values within both the HITSP C32 
   # and ASTM CCR documents that are to be input to popHealth
   class PatientSummaryReport
-
+      attr_accessor :sections
     # Each section is initialized with the appropriate meaningful use (MU) coding systems
     def initialize
       # Initialize the sections of the Patient Summary
@@ -15,7 +15,7 @@ module Stats
       @@mu_code_sets[:immunizations] = ["RxNorm","CVX"]
       @@mu_code_sets[:medical_equipment] = ["SNOMED-CT"]
       @@mu_code_sets[:medications] = ["RxNorm","CVX"]
-      @@mu_code_sets[:procedures] = ["CPT","ICD-9-CM","ICD-10-CM","HCPCS"]
+      @@mu_code_sets[:procedures] = ["CPT","ICD-9-CM","ICD-10-CM","HCPCS","SNOMED-CT"]
       @@mu_code_sets[:results] = ["LOINC","SNOMED-CT"]
       @@mu_code_sets[:social_history] = ["SNOMED-CT"]
       @@mu_code_sets[:vital_signs] = ["ICD-9-CM","ICD-10-CM","SNOMED-CT"]
@@ -99,6 +99,20 @@ module Stats
          end
        return summary_hash
    end
+
+   def merge(psr)
+     @sections.each_pair do |section, pss|
+       if(psr.sections[section])  #if we both have a section, merge
+         pss.merge(psr.sections[section])
+       end
+     end
+     # if the other guy has sections that we don't...add them
+     psr.sections.each_pair do |section,pss1|
+       if(!sections[section])
+         add_section(section, pss1)
+       end
+     end
+     end
 
   end
 

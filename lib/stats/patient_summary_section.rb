@@ -68,7 +68,7 @@ module Stats
   class PatientSummarySection
 
     attr_accessor :mu_coded_entries, :alien_coded_entries, :uncoded_entries
-    attr_reader :entries
+    attr_reader :entries, :mu_code_systems_found, :alien_code_systems_found
 
     def initialize(name, mu_code_systems)
       @name = name
@@ -81,6 +81,16 @@ module Stats
       @mu_code_systems = mu_code_systems
     end
 
+    def merge(pss)
+      @entries << pss.entries
+      STDERR.puts "this #{@mu_code_systems_found.class}   that #{pss.mu_code_systems_found.class}"
+      @mu_code_systems_found.merge(pss.mu_code_systems_found)
+      @alien_code_systems_found.merge(pss.alien_code_systems_found)
+      @uncoded_entries.concat(pss.uncoded_entries)
+      @alien_coded_entries.concat(pss.alien_coded_entries)
+      @mu_coded_entries.concat(pss.mu_coded_entries)
+    end
+    
     def unique_mu_entries
       # if there are no entries, return an empty hash
       if(mu_coded_entries.size  == 0)
@@ -204,6 +214,7 @@ module Stats
       mu_coded_entries.size + alien_coded_entries.size
     end
 
+=begin
     def alien_code_systems_found
       @alien_code_systems_found.keys
     end
@@ -211,7 +222,7 @@ module Stats
     def mu_code_systems_found
       @mu_code_systems_found.keys
     end
-
+=end
     def add_entry(entry)
       mu_code_found = false
       valid_code_found = false
