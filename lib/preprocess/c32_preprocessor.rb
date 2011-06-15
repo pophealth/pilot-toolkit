@@ -1,5 +1,5 @@
 
- #C32Preprocessor
+ #C32Preprocessor.
  # Patches certain LOINC codes found in C32 vitals section by adding a translation block to SNOMED-CT
  # SNOMED-CT codes are used by MU CQM, so this allows the coded data to be used by popHealth
    require 'nokogiri'
@@ -23,6 +23,9 @@ module C32Preprocessor
       @vitals_section.process
       @results_section.process
     end
+    
+    # Builds a Hash of (tag, value) for all of the referenced and declared identifiers
+    # Each of these tags will be queried once during the processing of the file, so doing a hash lookup beats doing an xpath search.
     def build_id_map
       @id_map = {}
       path = "//*[@ID]"
@@ -36,7 +39,16 @@ module C32Preprocessor
     end
     
   end
+  
  class PatchCodesSection
+   # Initialize a PatchCodesSection
+   # @param [Nokogiri::Doc] parsed xml document
+   # @param [String] the name of the C32 section
+   # @param [Hash] used to translate codes/free-text to codes to insert into C32
+   # @param [Hash] used to lookup tags to find string descriptions
+   # @param [String] xpath of entries in this section
+   # @param [String] xpath for code blocks within an entry
+   # @param [String] xpath for descriptions within an entry
    def initialize(doc, section, map, id_map, entry_xpath, code_xpath= "./cda:code", description_xpath = "./cda:code/cda:originalText/cda:reference[@value] | ./cda:text/cda:reference[@value] ")
      @doc = doc
      @section = section
@@ -46,6 +58,11 @@ module C32Preprocessor
      @code_xpath = code_xpath
      @description_xpath = description_xpath
    end
+   
+   
+   # Lookup a tag, return a description
+   # @param [String] tag from C32 entry
+   # @return [String] the description of the tag
    def lookup_tag(tag)
      value = @id_map[tag]
      # Not sure why, but sometimes the reference is #<Reference> and the ID value is <Reference>, and 
@@ -57,7 +74,11 @@ module C32Preprocessor
      return value
    end
 
-
+   # Add_translate_block:   add a translate block to an entry
+   # @param [Nokogiri::Node] code block node
+   # @param [String] code 
+   # @param [String] display name
+   # @param [String] code system name 
    def add_translate_block(code_element, code, display_name, code_system)
      code_system_oid = QME::Importer::CodeSystemHelper.oid_for_code_system(code_system)
 #     STDERR.puts "add_translate_block code_system = #{code_system} code_system_oid: #{code_system_oid} code_system_oid.size"
@@ -69,18 +90,21 @@ module C32Preprocessor
      end
    end
    
-   
+    # Add code translations to coded blocks
+    # @param [Nokogiri::Node]   the code element to be inspected and modified
     def add_code_translations(code_element)
 
      code = code_element['code']
      codesystem = code_element['codeSystemName']
      d = code_element['codeSystem']
-     STDERR.puts "add_code_translations section = #{@section} codesystem #{codesystem} code #{code}"
+#     STDERR.puts "add_code_translations section = #{@section} codesystem #{codesystem} code #{code}"
+     # If the map for this section is nil, or there are no entries for this codesystem--> we are done
      if(!@map || !@map[codesystem])
         return
       end
+     #  Lookup the code
      l = @map[codesystem][code]
-     STDERR.puts "l = #{l}"
+#     STDERR.puts "l = #{l}"
      if(l) # If there is a translation, add a translate block
        l.each do | translation |
          add_translate_block(code_element,translation[1], translation[2], translation[0])
@@ -88,13 +112,18 @@ module C32Preprocessor
      end
    end
 
-   def add_codes(entry, description)
-       if !@map || !@map["FREE-TEXT"]
+   # Add code translations based on descriptions
+   # @param [Nokogiri::Node]   the code element to be inspected and modified
+   # @param [Nokogiri::Node]   the description to be translated
+      def add_codes(entry, description)
+        # if the map for this section is nil, or there are no free-text entries -->we are done
+       if !@map["FREE-TEXT"]
          return
        end
-       tag = description[0]['value']
+       # Lookup the tag
+       tag = description['value']
        value = lookup_tag(tag)
-       STDERR.puts "FREE-TEXT value #{value}"
+#       STDERR.puts "FREE-TEXT value #{value}"
        # OK, now we have the description.   Let's look it up.
        l = @map["FREE-TEXT"][value]
        code_element = entry.at_xpath(@code_xpath)
@@ -116,7 +145,7 @@ module C32Preprocessor
        entries = @doc.xpath(@entry_xpath)
  #      STDERR.puts "Found #{entries.size} elements"
        entries.each do | entry|
-         description = entry.xpath(@description_xpath)
+         description = entry.at_xpath(@description_xpath)
          STDERR.puts "@description_xpath = #{@description_xpath} description = #{description} codes_xpath = #{@code_xpath}"
          codes = entry.xpath(@code_xpath)
 #         STDERR.puts "codes size = #{codes.size}"
