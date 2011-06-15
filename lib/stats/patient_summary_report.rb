@@ -23,6 +23,10 @@ module Stats
       @sections = {}
    end
    
+   # add_section
+   # @param [String]  name of the section
+   # @param [PatientSummarySection]  associated PatientSummarySection
+   #  Note that we add an accessor method when the section is added...this greatly simplifies methods that iterate over all existing sections
    def add_section(section, pss)
      @sections[section] = pss
      self.class.class_eval do

@@ -25,6 +25,7 @@ module CCRscan
     end
 
     def create_ccr_hash(doc)
+      # This should be generalized to use Xpath expressions for the different sections
       process_section(:conditions,        doc)
       process_section(:encounters,        doc)
       process_section(:procedures,        doc)
@@ -62,14 +63,14 @@ module CCRscan
     # Add the codes from a <Code> block to an Entry
     def process_codes(node, entry)
       codes = node.xpath("./ccr:Description/ccr:Code")
-      desctext = node.xpath("./ccr:Description/ccr:Text")[0].content
+      desctext = node.at_xpath("./ccr:Description/ccr:Text").content
       entry.description = desctext
       if codes.size > 0 
         found_code = true
         codes.each do |code|
           normalize_coding_system(code)
-          codetext = code.xpath("./ccr:CodingSystem")[0].content
-          entry.add_code(code.xpath("./ccr:Value")[0].content, codetext)
+          codetext = code.at_xpath("./ccr:CodingSystem").content
+          entry.add_code(code.at_xpath("./ccr:Value").content, codetext)
         end
       end
     end
@@ -81,8 +82,8 @@ module CCRscan
         found_code = true
         codes.each do |code|
           normalize_coding_system(code)
-          codetext = code.xpath("./ccr:CodingSystem")[0].content
-          entry.add_code(code.xpath("./ccr:Value")[0].content, codetext)
+          codetext = code.at_xpath("./ccr:CodingSystem").content
+          entry.add_code(code.at_xpath("./ccr:Value").content, codetext)
         end
       end
     end
@@ -135,8 +136,8 @@ module CCRscan
         products.each do | product |
           productName = product.xpath("./ccr:ProductName")
           brandName = product.xpath("./ccr:BrandName")
-          productNameText = productName.xpath("./ccr:Text")[0]
-          brandNameText = brandName.xpath("./ccr:Text")[0] 
+          productNameText = productName.at_xpath("./ccr:Text")
+          brandNameText = brandName.at_xpath("./ccr:Text") 
           entry.description = productNameText.content
           process_product_codes(productName, entry) # we throw any codes found within the productName and brandName into the same entry
           process_product_codes(brandName, entry)
