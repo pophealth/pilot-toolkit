@@ -1,0 +1,163 @@
+{
+  "allergies": {
+    "entries": 0,
+    "mu code systems": [
+      "RxNorm",
+      "SNOMED-CT"
+    ],
+    "coded entries": 0,
+    "mu coded entries": 0,
+    "mu code systems in use": [
+
+    ],
+    "non-mu coded entries": 0,
+    "non-mu code systems in use": [
+
+    ]
+    },
+  "care_goals": {
+    "entries": 0,
+    "mu code systems": [
+      "SNOMED-CT"
+    ],
+    "coded entries": 0,
+    "mu coded entries": 0,
+    "mu code systems in use": [
+
+    ],
+    "non-mu coded entries": 0,
+    "non-mu code systems in use": [
+
+    ]
+    },
+  "conditions": {
+    "entries": 23,
+    "mu code systems": [
+      "SNOMED-CT",
+      "ICD-9-CM",
+      "ICD-10-CM"
+    ],
+    "coded entries": 23,
+    "mu coded entries": 23,
+    "mu code systems in use": [
+      "ICD-9-CM"
+    ],
+    "non-mu coded entries": 0,
+    "non-mu code systems in use": [
+
+    ]
+    },
+  "encounters": {
+    "entries": 21,
+    "mu code systems": [
+      "CPT"
+    ],
+    "coded entries": 21,
+    "mu coded entries": 21,
+    "mu code systems in use": [
+      "CPT"
+    ],
+    "non-mu coded entries": 0,
+    "non-mu code systems in use": [
+
+    ]
+    },
+  "medical_equipment": {
+    "entries": 0,
+    "mu code systems": [
+      "SNOMED-CT"
+    ],
+    "coded entries": 0,
+    "mu coded entries": 0,
+    "mu code systems in use": [
+
+    ],
+    "non-mu coded entries": 0,
+    "non-mu code systems in use": [
+
+    ]
+    },
+  "medications": {
+    "entries": 11,
+    "mu code systems": [
+      "RxNorm",
+      "CVX"
+    ],
+    "coded entries": 11,
+    "mu coded entries": 11,
+    "mu code systems in use": [
+      "RxNorm"
+    ],
+    "non-mu coded entries": 0,
+    "non-mu code systems in use": [
+
+    ]
+    },
+  "procedures": {
+    "entries": 0,
+    "mu code systems": [
+      "CPT",
+      "ICD-9-CM",
+      "ICD-10-CM",
+      "HCPCS"
+    ],
+    "coded entries": 0,
+    "mu coded entries": 0,
+    "mu code systems in use": [
+
+    ],
+    "non-mu coded entries": 0,
+    "non-mu code systems in use": [
+
+    ]
+    },
+  "results": {
+    "entries": 151,
+    "mu code systems": [
+      "LOINC",
+      "SNOMED-CT"
+    ],
+    "coded entries": 0,
+    "mu coded entries": 0,
+    "mu code systems in use": [
+
+    ],
+    "non-mu coded entries": 0,
+    "non-mu code systems in use": [
+
+    ]
+    },
+  "social_history": {
+    "entries": 0,
+    "mu code systems": [
+      "SNOMED-CT"
+    ],
+    "coded entries": 0,
+    "mu coded entries": 0,
+    "mu code systems in use": [
+
+    ],
+    "non-mu coded entries": 0,
+    "non-mu code systems in use": [
+
+    ]
+    },
+  "vital_signs": {
+    "entries": 228,
+    "mu code systems": [
+      "ICD-9-CM",
+      "ICD-10-CM",
+      "SNOMED-CT"
+    ],
+    "coded entries": 228,
+    "mu coded entries": 0,
+    "mu code systems in use": [
+
+    ],
+    "non-mu coded entries": 228,
+    "non-mu code systems in use": [
+      "LOINC",
+      null
+    ]
+    }
+}

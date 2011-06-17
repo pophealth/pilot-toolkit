@@ -83,7 +83,7 @@ module C32Preprocessor
      code_system_oid = QME::Importer::CodeSystemHelper.oid_for_code_system(code_system)
 #     STDERR.puts "add_translate_block code_system = #{code_system} code_system_oid: #{code_system_oid} code_system_oid.size"
      Nokogiri::XML::Builder.with(code_element) do |xml|
-       xml.translation(:display_name => display_name,
+       xml.translation(
        :codeSystemName => code_system,
        :codeSystem => code_system_oid,
        :code => code)
