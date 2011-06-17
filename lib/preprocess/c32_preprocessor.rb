@@ -99,7 +99,7 @@ module C32Preprocessor
      d = code_element['codeSystem']
 #     STDERR.puts "add_code_translations section = #{@section} codesystem #{codesystem} code #{code}"
      # If the map for this section is nil, or there are no entries for this codesystem--> we are done
-     if(!@map || !@map[codesystem])
+     if(!@map[codesystem])
         return
       end
      #  Lookup the code
@@ -167,7 +167,7 @@ if __FILE__ == $0
    require 'json'
    require 'qme/importer/code_system_helper'
    if ARGV.size < 3
-     STDERR.puts "jruby vitals_to_snomed.rb <indir> <outdir> map.json"
+     STDERR.puts "jruby c32_preprocessor.rb <indir> <outdir> map.json"
      exit
    end
 
