@@ -20,7 +20,7 @@ class PatientSummaryReportTest < Test::Unit::TestCase
     assert_equal 0, psr.results.num_coded_entries
     assert_equal 2, psr.vital_signs.entries.size, "vital signs entries"
     assert_equal 2, psr.vital_signs.num_coded_entries, "vital signs coded entries"
-    assert_equal 0, psr.vital_signs.num_mu_coded_entries, "vital signs coded entries"    
+    assert_equal 0, psr.vital_signs.num_mu_coded_entries, "vital signs coded entries"
     map = JSON.parse(File.open('fixtures/mapping.json',"r").read)
     # Patch the file
     patcher = C32Preprocessor::PatchCodesDocument.new(doc,map)
@@ -40,7 +40,7 @@ class PatientSummaryReportTest < Test::Unit::TestCase
     assert_equal 1, psr2.results.num_coded_entries, "MU coding systems #{psr2.summary}"
     assert_equal 2, psr2.vital_signs.entries.size, "vital signs entries"
     assert_equal 2, psr2.vital_signs.num_coded_entries, "vital signs coded entries"
-    assert_equal 2, psr2.vital_signs.num_mu_coded_entries, "vital signs coded entries"    
+    assert_equal 2, psr2.vital_signs.num_mu_coded_entries, "vital signs coded entries"
   end
 
 end
