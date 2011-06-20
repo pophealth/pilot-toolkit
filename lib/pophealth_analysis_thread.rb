@@ -128,13 +128,13 @@ class PophealthAnalysisThread < Thread
       end
     end
     if (patient_summary_report.results)
-      if patient_summary_report.conditions.entries.size > 0
+      if patient_summary_report.results.entries.size > 0
         analysis_results["lab_results_present"] += 1
       end
-      if patient_summary_report.conditions.num_coded_entries > 0
+      if patient_summary_report.results.num_coded_entries > 0
         analysis_results["lab_results_coded"] += 1
       end
-      if patient_summary_report.conditions.mu_coded_entries.size > 0
+      if patient_summary_report.results.mu_coded_entries.size > 0
         analysis_results["lab_results_mu_compliant"] += 1
       end
     end
