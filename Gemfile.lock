@@ -1,6 +1,6 @@
 GIT
-  remote: http://github.com/saulkravitz/quality-measure-engine.git
-  revision: e0316dc474ce57d77bc5ce8586a8f54252c06d0b
+  remote: http://github.com/rmccready/quality-measure-engine.git
+  revision: 2173f6d27ef4e64468e16164a204bfacdb14ee68
   branch: develop
   specs:
     quality-measure-engine (0.8.1)
@@ -24,8 +24,8 @@ GEM
     mime-types (1.16)
     mongo (1.3.1)
       bson (>= 1.3.1)
-    nokogiri (1.4.5)
-    nokogiri (1.4.5-java)
+    nokogiri (1.4.6)
+    nokogiri (1.4.6-java)
       weakling (>= 0.0.3)
     rack (1.3.0)
     rake (0.9.2)

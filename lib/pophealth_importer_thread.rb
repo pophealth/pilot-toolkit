@@ -43,7 +43,7 @@ class PophealthImporterThread < Thread
               httppost = HttpPost.new("https://pophealth/records")
               credsProvider = BasicCredentialsProvider.new()
               credsProvider.setCredentials(
-                AuthScope.new("pophealth", AuthScope::ANY_PORT), 
+                AuthScope.new("pophealth", AuthScope::ANY_PORT),
                 UsernamePasswordCredentials.new("pophealth", "pophealth"))
               httpclient.setCredentialsProvider(credsProvider)
               httppost.setEntity(reqEntity)
