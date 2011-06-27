@@ -1,6 +1,6 @@
 GIT
   remote: http://github.com/rmccready/quality-measure-engine.git
-  revision: 2173f6d27ef4e64468e16164a204bfacdb14ee68
+  revision: d6ba13fe59a6e0639700ef3d0925156ee7c1d485
   branch: develop
   specs:
     quality-measure-engine (0.8.1)

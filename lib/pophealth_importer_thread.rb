@@ -22,6 +22,7 @@ class PophealthImporterThread < Thread
   def initialize
     @shutdown = false
     @import_records = false
+    @config = parse_configuration_file
   end
 
   def run
@@ -34,17 +35,15 @@ class PophealthImporterThread < Thread
           for i in (0..(files.length-1))
             @jframe.select_item(i)
             @jframe.update_text_areas
-            #RestClient.post "https://pophealth:pophealth@localhost:80/records", 
-            #                :content => File.new(@jframe.get_file_list.get_selected_value.get_file.get_path)
             httpclient = DefaultHttpClient.new()
             begin
               import_file = java.io.File.new(@jframe.get_file_list.get_selected_value.get_file.get_path)
               reqEntity = FileEntity.new(import_file, "text/xml")
-              httppost = HttpPost.new("https://pophealth/records")
+              httppost = HttpPost.new(@config['URL'].to_s)
               credsProvider = BasicCredentialsProvider.new()
               credsProvider.setCredentials(
-                AuthScope.new("pophealth", AuthScope::ANY_PORT),
-                UsernamePasswordCredentials.new("pophealth", "pophealth"))
+                AuthScope.new(@config['AUTHSCOPE'], AuthScope::ANY_PORT),
+                UsernamePasswordCredentials.new(@config['USER_NAME'], @config['PASSWORD']))
               httpclient.setCredentialsProvider(credsProvider)
               httppost.setEntity(reqEntity)
               puts("executing request " + httppost.getRequestLine().to_s)
@@ -91,6 +90,25 @@ class PophealthImporterThread < Thread
 
   def pause
     @import_records = false
+  end
+
+  private
+
+  def parse_configuration_file
+    config = {}
+    File.foreach("config/pophealth.properties") do |line|
+      line.strip!
+      # Skip comments and whitespace
+      if (line[0] != ?# and line =~ /\S/ )
+        i = line.index('=')
+        if (i)
+          config[line[0..i - 1].strip] = line[i + 1..-1].strip
+        else
+          config[line] = ''
+        end
+      end
+    end
+    config
   end
 
 end
