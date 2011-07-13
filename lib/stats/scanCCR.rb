@@ -18,7 +18,7 @@ module CCRscan
                    :care_goals        => "//ccr:Goals/ccr:Goal",
                    :social_history    => "//ccr:SocialHistory/ccr:SocialHistoryElement",
                    :medical_equipment => "//ccr:MedicalEquipment/ccr:Equipment",
-                   :allergies         => "//ccr:Alerts/ccr:Alert",           # special handling for Description
+                   :allergies         => "//ccr:Alerts/ccr:Alert",           
                    :vital_signs       => "//ccr:VitalSigns/ccr:Result",      # special handling for ./Test/Description
                    :results           => "//ccr:Results/ccr:Result",         # special handling for ./test...same as for vital_signs
                    :medications       => "//ccr:Medications/ccr:Medication" # special handling for productName, brandName
@@ -28,12 +28,7 @@ module CCRscan
     def create_ccr_hash(doc)
       # This should be generalized to use Xpath expressions for the different sections
 
-=begin
-      @sections.each_key do | section|
-        STDERR.puts section
-        process_section(section,doc)
-      end
-=end
+    # These all follow the same pattern
      process_section(:conditions,        doc)
       process_section(:encounters,        doc)
       process_section(:procedures,        doc)
@@ -41,9 +36,10 @@ module CCRscan
       process_section(:social_history,    doc)
       process_section(:medical_equipment, doc)
       process_section(:allergies,        doc)
-      process_vital_signs(:vital_signs,   doc)
-      process_vital_signs(:results,       doc)
-      process_medications(:medications,   doc)
+     # These are special
+      process_vital_signs(:vital_signs,   doc)   # Note that this is special!
+      process_vital_signs(:results,       doc)   # Note that this is special!
+      process_medications(:medications,   doc)   # Note that this is special!
 
       @ccr_hash
     end
