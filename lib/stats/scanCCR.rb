@@ -14,28 +14,37 @@ module CCRscan
       @ccr_hash = {}
       @sections = {:conditions        => "//ccr:Problems/ccr:Problem",
                    :encounters        => "//ccr:Encounters/ccr:Encounter",
-                   :medications       => "//ccr:Medications/ccr:Medication", # special handling for productName, brandName
-                   :allergies         => "//ccr:Alerts/ccr:Alert",           # special handling for Description
                    :procedures        => "//ccr:Procedures/ccr:Procedure",
-                   :vital_signs       => "//ccr:VitalSigns/ccr:Result",      # special handling for ./Test/Description
-                   :results           => "//ccr:Results/ccr:Result",         # special handling for ./test...same as for vital_signs
                    :care_goals        => "//ccr:Goals/ccr:Goal",
                    :social_history    => "//ccr:SocialHistory/ccr:SocialHistoryElement",
-                   :medical_equipment => "//ccr:MedicalEquipment/ccr:Equipment"}
+                   :medical_equipment => "//ccr:MedicalEquipment/ccr:Equipment",
+                   :allergies         => "//ccr:Alerts/ccr:Alert",           # special handling for Description
+                   :vital_signs       => "//ccr:VitalSigns/ccr:Result",      # special handling for ./Test/Description
+                   :results           => "//ccr:Results/ccr:Result",         # special handling for ./test...same as for vital_signs
+                   :medications       => "//ccr:Medications/ccr:Medication" # special handling for productName, brandName
+}
     end
 
     def create_ccr_hash(doc)
       # This should be generalized to use Xpath expressions for the different sections
-      process_section(:conditions,        doc)
+
+=begin
+      @sections.each_key do | section|
+        STDERR.puts section
+        process_section(section,doc)
+      end
+=end
+     process_section(:conditions,        doc)
       process_section(:encounters,        doc)
       process_section(:procedures,        doc)
       process_section(:care_goals,        doc)
       process_section(:social_history,    doc)
       process_section(:medical_equipment, doc)
-      process_section(:allergies,         doc)
+      process_section(:allergies,        doc)
       process_vital_signs(:vital_signs,   doc)
       process_vital_signs(:results,       doc)
       process_medications(:medications,   doc)
+
       @ccr_hash
     end
 
@@ -54,9 +63,9 @@ module CCRscan
         "icd9-cm"   => "ICD-9-CM",
         "icd9"      => "ICD-9-CM"
       }
-      codingsystem = lookup[code.xpath('./ccr:CodingSystem')[0].content.downcase]
+      codingsystem = lookup[code.at_xpath('./ccr:CodingSystem').content.downcase]
       if(codingsystem)
-        code.xpath('./ccr:CodingSystem')[0].content = codingsystem
+        code.at_xpath('./ccr:CodingSystem').content = codingsystem
       end
     end
 
@@ -90,7 +99,7 @@ module CCRscan
 
     # Process most of the sections.  Some sections require special handling.
     def process_section(section_name, doc)
-      #STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
+      STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
       entries = doc.xpath(@sections[section_name])
       if(entries.size == 0)
         return
