@@ -41,10 +41,12 @@ module Stats
       psr = PatientSummaryReport.new
       pi = QME::Importer::PatientImporter.instance
       #patient_entry_hash = pi.create_c32_hash(document, false)
-      patient_entry_hash = pi.create_c32_hash(document)
+      patient_entry_hash = pi.create_c32_hash(document,false)
       patient_entry_hash.each_pair do |section, entry_list|
         pss = PatientSummarySection.new(section, @@mu_code_sets[section])
+        #STDERR.puts section
         entry_list.each do |entry|   #transfer the entries.   Could this be a simple array assignment?
+          # STDERR.puts "codes = #{entry.codes}  description = #{entry.description}"
           pss.add_entry(entry)
         end
         psr.add_section(section, pss)

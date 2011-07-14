@@ -83,8 +83,7 @@ module Stats
 
     def merge(pss)
       @entries << pss.entries
-      STDERR.puts "this #{@mu_code_systems_found.class}   that #{pss.mu_code_systems_found.class}"
-      @mu_code_systems_found.merge(pss.mu_code_systems_found)
+       @mu_code_systems_found.merge(pss.mu_code_systems_found)
       @alien_code_systems_found.merge(pss.alien_code_systems_found)
       @uncoded_entries.concat(pss.uncoded_entries)
       @alien_coded_entries.concat(pss.alien_coded_entries)
