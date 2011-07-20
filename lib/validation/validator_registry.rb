@@ -18,8 +18,10 @@ module Validation
       # and downloaded the CCR schema .xsd, and integrated it with the popHealth importer user
       # interface.  Therefore, if the schema file is not present, return nil.
       if (File.exists?("resources/xml_schema/ccr/infrastructure/ccr.xsd"))
+        puts "Found CCR Schema file"
         @ccr_schema_validator ||= XMLSchemaValidator.new('resources/xml_schema/ccr/infrastructure/ccr.xsd')
       end
+      #puts " ccr_schema_validator is " + ccr_schema_validator
       @ccr_schema_validator
     end
 

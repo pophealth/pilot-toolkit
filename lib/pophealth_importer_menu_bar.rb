@@ -119,8 +119,10 @@ class PophealthImporterMenuBar < JMenuBar
           registered_listener.stop
         elsif (e.getActionCommand() == "C32")
           registered_listener.switch_to_c32_mode
+          @ccr_mode_menu_item.set_selected(false)
         elsif (e.getActionCommand() == "CCR")
           registered_listener.switch_to_ccr_mode
+          @c32_mode_menu_item.set_selected(false)
         elsif (e.getActionCommand() == "Help")
           registered_listener.help
         elsif (e.getActionCommand() == "About")

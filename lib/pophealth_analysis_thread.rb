@@ -138,17 +138,6 @@ class PophealthAnalysisThread < Thread
         analysis_results["lab_results_mu_compliant"] += 1
       end
     end
-    if (patient_summary_report.immunizations)
-      if patient_summary_report.immunizations.entries.size > 0
-        analysis_results["immunizations_present"] += 1
-      end
-      if patient_summary_report.immunizations.num_coded_entries > 0
-        analysis_results["immunizations_coded"] += 1
-      end
-      if patient_summary_report.immunizations.mu_coded_entries.size > 0
-        analysis_results["immunizations_mu_compliant"] += 1
-      end
-    end
     if (patient_summary_report.medications)
       if patient_summary_report.medications.entries.size > 0
         analysis_results["medications_present"] += 1
@@ -200,9 +189,6 @@ class PophealthAnalysisThread < Thread
       "lab_results_present"         => 0.0,
       "lab_results_coded"           => 0.0,
       "lab_results_mu_compliant"    => 0.0,
-      "immunizations_present"       => 0.0,
-      "immunizations_coded"         => 0.0,
-      "immunizations_mu_compliant"  => 0.0,
       "medications_present"         => 0.0,
       "medications_coded"           => 0.0,
       "medications_mu_compliant"    => 0.0,

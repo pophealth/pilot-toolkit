@@ -15,6 +15,7 @@ module CCRscan
       @sections = {:conditions        => "//ccr:Problems/ccr:Problem",
                    :encounters        => "//ccr:Encounters/ccr:Encounter",
                    :medications       => "//ccr:Medications/ccr:Medication", # special handling for productName, brandName
+                   :immunizations     => "//ccr:Immunizations/ccr:Immunization", # special handling for productName, brandName
                    :allergies         => "//ccr:Alerts/ccr:Alert",           # special handling for Description
                    :procedures        => "//ccr:Procedures/ccr:Procedure",
                    :vital_signs       => "//ccr:VitalSigns/ccr:Result",      # special handling for ./Test/Description
@@ -36,6 +37,7 @@ module CCRscan
       process_vital_signs(:vital_signs,   doc)
       process_vital_signs(:results,       doc)
       process_medications(:medications,   doc)
+      process_medications(:immunizations, doc)
       @ccr_hash
     end
 
@@ -90,7 +92,6 @@ module CCRscan
 
     # Process most of the sections.  Some sections require special handling.
     def process_section(section_name, doc)
-      #STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
       entries = doc.xpath(@sections[section_name])
       if(entries.size == 0)
         return
@@ -105,7 +106,6 @@ module CCRscan
 
     # Special handling for the vital signs section
     def process_vital_signs(section_name, doc)
-      #STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
       results = doc.xpath(@sections[section_name])
       if (results.size == 0)
         return
@@ -124,7 +124,6 @@ module CCRscan
 
     # Special handling for the medications section
     def process_medications (section_name, doc)
-      #STDERR.puts "process_section #{section_name} starting at #{@sections[section_name]}"
       meds = doc.xpath(@sections[section_name])
       if(meds.size == 0)
         return
