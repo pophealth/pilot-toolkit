@@ -199,8 +199,8 @@ end
 # if launched as a standalone program, not loaded as a module
 if __FILE__ == $0
   require 'quality-measure-engine'
-  require 'patient_summary_report'
-  require 'patient_summary_section'
+  require_relative 'patient_summary_report'
+  require_relative 'patient_summary_section'
   require 'nokogiri'
   require 'json'
 
