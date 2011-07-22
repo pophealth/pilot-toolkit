@@ -1,76 +1,178 @@
 {
-    "vital_signs": {
-        "LOINC": {
-            "8462-4": [
-                [
-                    "SNOMED-CT",
-                    "271650006",
-                    "blood pressure, diastolic"
-                ]
-            ],
-            "8480-6": [
-                [
-                    "SNOMED-CT",
-                    "271649006",
-                    "blood pressure, systolic"
-                ]
-            ],
-            "8302-2": [
-                [
-                    "SNOMED-CT",
-                    "248327008",
-                    "height"
-                ]
-            ],
-            "3141-9": [
-                [
-                    "SNOMED-CT",
-                    "107647005",
-                    "weight"
-                ]
-            ],
-            "8867-4": [
-                [
-                    "SNOMED-CT",
-                    "366199006",
-                    "pulse rate"
-                ]
-            ],
-            "9279-1": [
-                [
-                    "SNOMED-CT",
-                    "366147009",
-                    "respiratory rate"
-                ]
-            ],
-            "8310-5": [
-                [
-                    "SNOMED-CT",
-                    "309646008",
-                    "temperature"
-                ]
-            ]
-        }
-    },
-    "results": {
-        "FREE-TEXT": {
-            "HDL cholesterol, serum": [
-                [
-                    "CPT",
-                    "83701",
-                    "HDL cholesterol, serum"
-                ],
-                [
-                    "LOINC",
-                    " 2085-9",
-                    "HDL cholesterol, serum"
-                ],
-                [
-                    "SNOMED-CT",
-                    "121792008",
-                    "HDL cholesterol, serum"
-                ]
-            ]
-        }
+  "vital_signs": {
+    "LOINC": {
+      "8462-4": [
+        [
+          "SNOMED-CT",
+          "271650006",
+          "blood pressure, diastolic"
+        ]
+      ],
+      "8480-6": [
+        [
+          "SNOMED-CT",
+          "271649006",
+          "blood pressure, systolic"
+        ]
+      ],
+      "8302-2": [
+        [
+          "SNOMED-CT",
+          "248327008",
+          "height"
+        ]
+      ],
+      "3141-9": [
+        [
+          "SNOMED-CT",
+          "107647005",
+          "weight"
+        ]
+      ],
+      "8867-4": [
+        [
+          "SNOMED-CT",
+          "366199006",
+          "pulse rate"
+        ]
+      ],
+      "9279-1": [
+        [
+          "SNOMED-CT",
+          "366147009",
+          "respiratory rate"
+        ]
+      ],
+      "8310-5": [
+        [
+          "SNOMED-CT",
+          "309646008",
+          "temperature"
+        ]
+      ]
     }
+  },
+  "results": {
+    "FREE-TEXT": {
+      "PLACEHOLDER: FOBT": [
+        [
+          "LOINC",
+          "14563-1",
+          "FOBT"
+        ]
+      ],
+      "PLACEHOLDER: Gleason Score": [
+        [
+          "LOINC",
+          "35266-6",
+          "Gleason Score"
+        ]
+      ],
+      "PLACEHOLDER: Group A Streptococcus Test": [
+        [
+          "LOINC",
+          "18481-2",
+          "Group A Streptococcus Test"
+        ]
+      ],
+      "PLACEHOLDER: Nephropathy Screening": [
+        [
+          "LOINC",
+          "13705-9",
+          "Nephropathy Screening"
+        ]
+      ],
+      "PLACEHOLDER: Pap Test": [
+        [
+          "LOINC",
+          "19762-4",
+          "Pap Test"
+        ]
+      ],
+      "PLACEHOLDER: Pregnancy Test": [
+        [
+          "LOINC",
+          "20415-6",
+          "Pregnancy Test"
+        ]
+      ],
+      "PLACEHOLDER: Rh Status": [
+        [
+          "LOINC",
+          "10331-7",
+          "Rh Status -- SAK: DON'T WE NEED MOTHER/CHILD Rh"
+        ]
+      ],
+      "PLACEHOLDER: microalbumin": [
+        [
+          "LOINC",
+          "53525-2",
+          "Urine Macroalbumin"
+        ]
+      ],
+      "PLACEHOLDER: Chlamydia screening": [
+        [
+          "LOINC",
+          "14470-9",
+          "Chlamydia screening"
+        ]
+      ],
+      "hemoglobin A1C, blood, as % of total hemoglobin": [
+        [
+          "LOINC",
+          "4549-2",
+          "HbA1c test"
+        ]
+      ],
+      "HDL cholesterol, serum": [
+        [
+          "LOINC",
+          "2085-9",
+          "HDL cholesterol, serum"
+        ]
+      ],
+      "cholesterol/HDL ratio, serum": [
+        [
+          "LOINC",
+          "2085-9",
+          "HDL Cholesterol -- SAK:  IS THIS RIGHT?"
+        ]
+      ],
+      "HIV-1/HIV-2 Ab, serum": [
+        [
+          "LOINC",
+          "35452-2",
+          "HIV Screening"
+        ]
+      ],
+      "LDL cholesterol, serum": [
+        [
+          "LOINC",
+          "18261-8",
+          "LDL Cholesterol"
+        ]
+      ],
+      "prostate specific antigen": [
+        [
+          "LOINC",
+          "12841-3",
+          "Prostate Specific Antigen Test"
+        ]
+      ],
+      "cholesterol, serum": [
+        [
+          "LOINC",
+          "14647-2",
+          "Total Cholesterol"
+        ]
+      ],
+      "triglyceride, serum, fasting": [
+        [
+          "LOINC",
+          "2571-8",
+          "Triglycerides"
+        ]
+      ]
+    }
+  }
 }

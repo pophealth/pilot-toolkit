@@ -12,8 +12,8 @@ class CCRParseAndStatsTest < Test::Unit::TestCase
     assert_equal 1, psr.summary[:conditions]["mu coded entries"]
     assert_equal 1, psr.summary[:conditions]["entries"]
     unique_non_mu_entries = psr.unique_non_mu_entries
-    assert_equal 3, unique_non_mu_entries.keys.size  
-    assert_equal 4, summary.keys.size  
+    assert_equal 3, unique_non_mu_entries.keys.size
+    assert_equal 4, summary.keys.size
   end
 
 end

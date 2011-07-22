@@ -9,7 +9,7 @@ require 'lib/pophealth_importer_jframe'
 pophealth_splash_screen = PophealthSplashScreen.new()
 pophealth_splash_screen.setVisible(true)
 begin
-  sleep 3 # give the splash screen 2 seconds
+  sleep 3 # give the splash screen 3 seconds
 rescue InterruptedException => ie
   $stderr.print "Problem displaying the popHealth splash screen. See: #{ie}n"
 end

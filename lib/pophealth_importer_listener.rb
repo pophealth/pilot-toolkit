@@ -32,7 +32,6 @@ class PophealthImporterListener
   end
 
   def stop
-    puts "Write logic for stopping"
   end
 
   def open
@@ -50,7 +49,6 @@ class PophealthImporterListener
   end
 
   def save_import_results
-    puts "Write logic for saving results here"
   end
 
   def quit
