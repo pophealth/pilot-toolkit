@@ -94,92 +94,17 @@ class PophealthAnalysisThread < Thread
   end
 
   def update_analysis_results(patient_summary_report, analysis_results)
-    if (patient_summary_report.allergies)
-      if patient_summary_report.allergies.entries.size > 0
-        analysis_results["allergies_present"] += 1
-      end
-      if patient_summary_report.allergies.num_coded_entries > 0
-        analysis_results["allergies_coded"] += 1
-      end
-      if patient_summary_report.allergies.mu_coded_entries.size > 0
-        analysis_results["allergies_mu_compliant"] += 1
-      end
-    end
-    if (patient_summary_report.encounters)
-      if patient_summary_report.encounters.entries.size > 0
-        analysis_results["encounters_present"] += 1
-      end
-      if patient_summary_report.encounters.num_coded_entries > 0
-        analysis_results["encounters_coded"] += 1
-      end
-      if patient_summary_report.encounters.mu_coded_entries.size > 0
-        analysis_results["encounters_mu_compliant"] += 1
-      end
-    end
-    if (patient_summary_report.conditions)
-      if patient_summary_report.conditions.entries.size > 0
-        analysis_results["conditions_present"] += 1
-      end
-      if patient_summary_report.conditions.num_coded_entries > 0
-        analysis_results["conditions_coded"] += 1
-      end
-      if patient_summary_report.conditions.mu_coded_entries.size > 0
-        analysis_results["conditions_mu_compliant"] += 1
-      end
-    end
-    if (patient_summary_report.results)
-      if patient_summary_report.results.entries.size > 0
-        analysis_results["lab_results_present"] += 1
-      end
-      if patient_summary_report.results.num_coded_entries > 0
-        analysis_results["lab_results_coded"] += 1
-      end
-      if patient_summary_report.results.mu_coded_entries.size > 0
-        analysis_results["lab_results_mu_compliant"] += 1
-      end
-    end
-    if (patient_summary_report.medications)
-      if patient_summary_report.medications.entries.size > 0
-        analysis_results["medications_present"] += 1
-      end
-      if patient_summary_report.medications.num_coded_entries > 0
-        analysis_results["medications_coded"] += 1
-      end
-      if patient_summary_report.medications.mu_coded_entries.size > 0
-        analysis_results["medications_mu_compliant"] += 1
-      end
-    end
-    if (patient_summary_report.immunizations)
-      if patient_summary_report.immunizations.entries.size > 0
-        analysis_results["immunizations_present"] += 1
-      end
-      if patient_summary_report.immunizations.num_coded_entries > 0
-        analysis_results["immunizations_coded"] += 1
-      end
-      if patient_summary_report.immunizations.mu_coded_entries.size > 0
-        analysis_results["immunizations_mu_compliant"] += 1
-      end
-    end
-    if (patient_summary_report.procedures)
-      if patient_summary_report.procedures.entries.size > 0
-        analysis_results["procedures_present"] += 1
-      end
-      if patient_summary_report.procedures.num_coded_entries > 0
-        analysis_results["procedures_coded"] += 1
-      end
-      if patient_summary_report.procedures.mu_coded_entries.size > 0
-        analysis_results["procedures_mu_compliant"] += 1
-      end
-    end
-    if (patient_summary_report.procedures)
-      if patient_summary_report.vital_signs.entries.size > 0
-        analysis_results["vital_signs_present"] += 1
-      end
-      if patient_summary_report.vital_signs.num_coded_entries > 0
-        analysis_results["vital_signs_coded"] += 1
-      end
-      if patient_summary_report.vital_signs.mu_coded_entries.size > 0
-        analysis_results["vital_signs_mu_compliant"] += 1
+    patient_summary_report.sections.keys.each do |section|
+      if (patient_summary_report.respond_to?(section) && patient_summary_report.send(section))
+        if ! patient_summary_report.send(section).entries.empty?
+          analysis_results["#{section}_present"] += 1 if analysis_results["#{section}_present"]
+        end
+        if patient_summary_report.send(section).num_coded_entries > 0
+          analysis_results["#{section}_coded"] += 1 if analysis_results["#{section}_coded"]
+        end
+        if patient_summary_report.send(section).mu_coded_entries.size > 0
+          analysis_results["#{section}_mu_compliant"] += 1 if analysis_results["#{section}_mu_compliant"]
+        end
       end
     end
   end
