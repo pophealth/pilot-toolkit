@@ -32,15 +32,15 @@ module Stats
     def add_section(section, pss)
       @sections[section] = pss
       self.class.class_eval do
-       define_method(section){ @sections[section] }
+        define_method(section){ @sections[section] }
       end
     end
 
-   # from_c32:  read a Nokogiri::Document, and leverage the QME patient importer to 
-   # create a hash of entries broken down by section.  Pass these through the 
-   # PatientSummarySection analysis
-   # @param [Nokogiri::Document]   source document
-   def self.from_c32(document)
+    # from_c32:  read a Nokogiri::Document, and leverage the QME patient importer to 
+    # create a hash of entries broken down by section.  Pass these through the 
+    # PatientSummarySection analysis
+    # @param [Nokogiri::Document]   source document
+    def self.from_c32(document)
       psr = PatientSummaryReport.new
       pi = QME::Importer::PatientImporter.instance
       # The false argument on create_c32_hash is *IMPORTANT*.  It means, don't ignore entries that lack codes, etc, which is the default behavior

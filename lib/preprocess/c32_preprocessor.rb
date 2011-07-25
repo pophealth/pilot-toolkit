@@ -145,7 +145,7 @@ module C32Preprocessor
 end
 
 # if launched as a standalone program, not loaded as a module
-if __FILE__ == $0
+if __FILE__ == $0 
   require 'nokogiri'
   require 'json'
   require 'qme/importer/code_system_helper'

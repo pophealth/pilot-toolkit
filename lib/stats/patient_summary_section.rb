@@ -83,13 +83,13 @@ module Stats
 
     def merge(pss)
       @entries << pss.entries
-       @mu_code_systems_found.merge(pss.mu_code_systems_found)
+      @mu_code_systems_found.merge(pss.mu_code_systems_found)
       @alien_code_systems_found.merge(pss.alien_code_systems_found)
       @uncoded_entries.concat(pss.uncoded_entries)
       @alien_coded_entries.concat(pss.alien_coded_entries)
       @mu_coded_entries.concat(pss.mu_coded_entries)
     end
-    
+
     def unique_mu_entries
       # if there are no entries, return an empty hash
       if(mu_coded_entries.size  == 0)
@@ -214,106 +214,106 @@ module Stats
     end
 
 =begin
-    def alien_code_systems_found
-      @alien_code_systems_found.keys
-    end
+def alien_code_systems_found
+@alien_code_systems_found.keys
+end
 
-    def mu_code_systems_found
-      @mu_code_systems_found.keys
-    end
+def mu_code_systems_found
+@mu_code_systems_found.keys
+end
 =end
-    def add_entry(entry)
-      mu_code_found = false
-      valid_code_found = false
-      @entries << entry
-      entry.codes.each_pair do |codeset, values|
-        valid_code = false
-        values.each do | value |   # Is there a valid code for this codeset
-          #v = (Stats::CodeSetValidator.valid_code(codeset, value) && entry.usable?)
-          v = (Stats::CodeSetValidator.valid_code(codeset, value) )
-          valid_code = valid_code || v
-        end
-        # Timestamp code breaks CCR test cases, since we don't yet capture timestamps there
-        # if(!valid_code || !entry.usable?)   #If we've not seen a valid code or there is a timestamp
-        if(!valid_code)
-          STDERR.puts "Entry is not usable due to invalid code or lack of timestamp"
-        else #otherwise, is it an appropriate code set?
-          valid_code_found = true
-          if @mu_code_systems.include?(codeset)
-            mu_code_found = true;
-            @mu_code_systems_found[codeset] = true
-          else
-            @alien_code_systems_found[codeset] = true
-          end
-        end
-      end 
-      if !valid_code_found
-        @uncoded_entries << entry
+def add_entry(entry)
+  mu_code_found = false
+  valid_code_found = false
+  @entries << entry
+  entry.codes.each_pair do |codeset, values|
+    valid_code = false
+    values.each do | value |   # Is there a valid code for this codeset
+      #v = (Stats::CodeSetValidator.valid_code(codeset, value) && entry.usable?)
+      v = (Stats::CodeSetValidator.valid_code(codeset, value) )
+      valid_code = valid_code || v
+    end
+    # Timestamp code breaks CCR test cases, since we don't yet capture timestamps there
+    # if(!valid_code || !entry.usable?)   #If we've not seen a valid code or there is a timestamp
+    if(!valid_code)
+      STDERR.puts "Entry is not usable due to invalid code or lack of timestamp"
+    else #otherwise, is it an appropriate code set?
+      valid_code_found = true
+      if @mu_code_systems.include?(codeset)
+        mu_code_found = true;
+        @mu_code_systems_found[codeset] = true
       else
-        if mu_code_found
-          @mu_coded_entries << entry    # If an entry has both mu codes and alien codes, it is classified as mu_coded
-        else
-          @alien_coded_entries << entry # contains only non-mu codes
-        end
+        @alien_code_systems_found[codeset] = true
       end
     end
+  end 
+  if !valid_code_found
+    @uncoded_entries << entry
+  else
+    if mu_code_found
+      @mu_coded_entries << entry    # If an entry has both mu codes and alien codes, it is classified as mu_coded
+    else
+      @alien_coded_entries << entry # contains only non-mu codes
+    end
   end
+end
+end
 end
 
 # if launched as a standalone program, not loaded as a module
 if __FILE__ == $0
 
-   section = Stats::PatientSummarySection.new("junk",["ICD9","ICD10","SNOMED-CT"])
+  section = Stats::PatientSummarySection.new("junk",["ICD9","ICD10","SNOMED-CT"])
 
-   entry = QME::Importer::Entry.new
-   entry.description = "test_entry 1"
-   entry.add_code(32000, "ICD9")
-   entry.add_code(32001,"ICD9")
-   entry.add_code(32000, "LOINC")
-   entry.add_code(32001,"ICD10")
-   entry.add_code(1,"GORK")
-   section.add_entry(entry)
+  entry = QME::Importer::Entry.new
+  entry.description = "test_entry 1"
+  entry.add_code(32000, "ICD9")
+  entry.add_code(32001,"ICD9")
+  entry.add_code(32000, "LOINC")
+  entry.add_code(32001,"ICD10")
+  entry.add_code(1,"GORK")
+  section.add_entry(entry)
 
-   entry1 = QME::Importer::Entry.new
-   entry1.description = "test_entry 2"
-   entry1.add_code(32000, "ICD9")
-   entry1.add_code(32002,"ICD9")
-   entry1.add_code(32000, "FOO1")
-   entry1.add_code(32001,"BAR1")
-   section.add_entry(entry)
+  entry1 = QME::Importer::Entry.new
+  entry1.description = "test_entry 2"
+  entry1.add_code(32000, "ICD9")
+  entry1.add_code(32002,"ICD9")
+  entry1.add_code(32000, "FOO1")
+  entry1.add_code(32001,"BAR1")
+  section.add_entry(entry)
 
-   entry2 = QME::Importer::Entry.new
-   entry2.description = "test_entry 3"
-   entry2.add_code(32000, "FOO")
-   entry2.add_code(32002,"FOO")
-   entry2.add_code(32000, "BAR")
-   entry2.add_code(32001,"BAR1")
-   section.add_entry(entry2)
+  entry2 = QME::Importer::Entry.new
+  entry2.description = "test_entry 3"
+  entry2.add_code(32000, "FOO")
+  entry2.add_code(32002,"FOO")
+  entry2.add_code(32000, "BAR")
+  entry2.add_code(32001,"BAR1")
+  section.add_entry(entry2)
 
-   entry3 = QME::Importer::Entry.new
-   entry3.description = "test_entry 4"
-   entry3.add_code(32002, "FOO")
-   entry3.add_code(32004,"FOO")
-   entry3.add_code(32006, "BAR")
-   entry3.add_code(32008,"BAR1")
-   section.add_entry(entry3)
+  entry3 = QME::Importer::Entry.new
+  entry3.description = "test_entry 4"
+  entry3.add_code(32002, "FOO")
+  entry3.add_code(32004,"FOO")
+  entry3.add_code(32006, "BAR")
+  entry3.add_code(32008,"BAR1")
+  section.add_entry(entry3)
 
-   unique_non_mu_entries = section.unique_non_mu_entries
-   unique_non_mu_entries.each_pair do | key, value |
-     STDERR.puts "key = #{key}   value = #{value}   valueclass = #{value.class}"
-     value.each_pair do | k,v|
-       STDERR.puts "\tkey = #{k}   value = #{v}   valueclass = #{v.class}"
-     end
-   end
+  unique_non_mu_entries = section.unique_non_mu_entries
+  unique_non_mu_entries.each_pair do | key, value |
+    STDERR.puts "key = #{key}   value = #{value}   valueclass = #{value.class}"
+    value.each_pair do | k,v|
+      STDERR.puts "\tkey = #{k}   value = #{v}   valueclass = #{v.class}"
+    end
+  end
 
-   section.dump(STDERR)
-   STDERR.puts section.summary
-   STDERR.puts JSON.pretty_generate(section.unique_non_mu_entries)
-   entrya = Stats::StatsEntry.fromEntry(entry)
-   entry1a = Stats::StatsEntry.fromEntry(entry1)
-   entry1a.description = entrya.description
- 
-   entrya.add(entry1a)
-   entrya.dump(STDERR)
+  section.dump(STDERR)
+  STDERR.puts section.summary
+  STDERR.puts JSON.pretty_generate(section.unique_non_mu_entries)
+  entrya = Stats::StatsEntry.fromEntry(entry)
+  entry1a = Stats::StatsEntry.fromEntry(entry1)
+  entry1a.description = entrya.description
+
+  entrya.add(entry1a)
+  entrya.dump(STDERR)
 
 end

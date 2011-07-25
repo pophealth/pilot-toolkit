@@ -3,86 +3,86 @@
 module CCRscan
 
   class CCRFile
-     def self.process(infile, summaryfile, mufile, nmufile)
+    def self.process(infile, summaryfile, mufile, nmufile)
 
-STDERR.puts "CCRFile.process = #{infile}"
-       doc = Nokogiri::XML(File.open(infile) ) 
-       doc.root.add_namespace_definition('ccr', "urn:astm-org:CCR")
-       
-       nmufp = File.open(nmufile,"w")
-       mufp = File.open(mufile,"w")
-       summaryfp = File.open(summaryfile,"w")
+      STDERR.puts "CCRFile.process = #{infile}"
+      doc = Nokogiri::XML(File.open(infile) ) 
+      doc.root.add_namespace_definition('ccr', "urn:astm-org:CCR")
 
-       psr = Stats::PatientSummaryReport.from_ccr(doc)
-       psr.dump
-       summaryfp.puts JSON.pretty_generate(psr.summary)
-       nmufp.puts JSON.pretty_generate(psr.unique_non_mu_entries)
-       mufp.puts JSON.pretty_generate(psr.unique_mu_entries)
-       return psr
-     end
-   end
-   class CCRDir
-     @@results = []
-     def self.process(indir, outdir)
-STDERR.puts "CCRDir.process = #{indir}" 
+      nmufp = File.open(nmufile,"w")
+      mufp = File.open(mufile,"w")
+      summaryfp = File.open(summaryfile,"w")
+
+      psr = Stats::PatientSummaryReport.from_ccr(doc)
+      psr.dump
+      summaryfp.puts JSON.pretty_generate(psr.summary)
+      nmufp.puts JSON.pretty_generate(psr.unique_non_mu_entries)
+      mufp.puts JSON.pretty_generate(psr.unique_mu_entries)
+      return psr
+    end
+  end
+  class CCRDir
+    @@results = []
+    def self.process(indir, outdir)
+      STDERR.puts "CCRDir.process = #{indir}" 
       @@results = []
-       @@outdir = outdir
-       Dir.glob("#{indir}/*.{xml,XML}") do |item|
-         infilename = File.basename(item) 
-         STDERR.puts "infile  = #{item}  infilename = #{infilename}"
-         mu = "#{outdir}/#{infilename}.mu"
-         nmu = "#{outdir}/#{infilename}.nmu"
-         summary = "#{outdir}/#{infilename}.summary"
-         STDERR.puts "Processing #{item}"
-         @@results << CCRscan::CCRFile.process(item, summary, mu, nmu)
-       end 
-     end
-       def self.consolidate
-         overallfp = File.open("#{@@outdir}/overall.summary","w")
-         overallmu = File.open("#{@@outdir}/overall.mu","w")
-         overallnmu = File.open("#{@@outdir}/overall.nmu","w")
+      @@outdir = outdir
+      Dir.glob("#{indir}/*.{xml,XML}") do |item|
+        infilename = File.basename(item) 
+        STDERR.puts "infile  = #{item}  infilename = #{infilename}"
+        mu = "#{outdir}/#{infilename}.mu"
+        nmu = "#{outdir}/#{infilename}.nmu"
+        summary = "#{outdir}/#{infilename}.summary"
+        STDERR.puts "Processing #{item}"
+        @@results << CCRscan::CCRFile.process(item, summary, mu, nmu)
+      end 
+    end
+    def self.consolidate
+      overallfp = File.open("#{@@outdir}/overall.summary","w")
+      overallmu = File.open("#{@@outdir}/overall.mu","w")
+      overallnmu = File.open("#{@@outdir}/overall.nmu","w")
 
-         outpsr = Stats::PatientSummaryReport.new
-         @@results.each do |psr |
-           outpsr.merge(psr)
-         end
-         overallfp.puts JSON.pretty_generate(outpsr.summary)
-         overallnmu.puts JSON.pretty_generate(outpsr.unique_non_mu_entries)
-         overallmu.puts JSON.pretty_generate(outpsr.unique_mu_entries)
-         outpsr.dump
-       end
+      outpsr = Stats::PatientSummaryReport.new
+      @@results.each do |psr |
+        outpsr.merge(psr)
+      end
+      overallfp.puts JSON.pretty_generate(outpsr.summary)
+      overallnmu.puts JSON.pretty_generate(outpsr.unique_non_mu_entries)
+      overallmu.puts JSON.pretty_generate(outpsr.unique_mu_entries)
+      outpsr.dump
+    end
 
-     end
+  end
   class CCR
 
     def initialize()
       @ccr_hash = {}
       @sections = {:conditions        => "//ccr:Problems/ccr:Problem",
-                   :encounters        => "//ccr:Encounters/ccr:Encounter",
-                   :procedures        => "//ccr:Procedures/ccr:Procedure",
-                   :care_goals        => "//ccr:Goals/ccr:Goal",
-                   :social_history    => "//ccr:SocialHistory/ccr:SocialHistoryElement",
-                   :medical_equipment => "//ccr:MedicalEquipment/ccr:Equipment",
-                   :allergies         => "//ccr:Alerts/ccr:Alert",           # special handling for Description
-                   :vital_signs       => "//ccr:VitalSigns/ccr:Result",      # special handling for ./Test/Description
-                   :results           => "//ccr:Results/ccr:Result",         # special handling for ./test...same as for vital_signs
-                   :medications       => "//ccr:Medications/ccr:Medication", # special handling for productName, brandName
-                   :immunizations     => "//ccr:Immunizations/ccr:Immunization" # special handling for productName, brandName
-}
+        :encounters        => "//ccr:Encounters/ccr:Encounter",
+        :procedures        => "//ccr:Procedures/ccr:Procedure",
+        :care_goals        => "//ccr:Goals/ccr:Goal",
+        :social_history    => "//ccr:SocialHistory/ccr:SocialHistoryElement",
+        :medical_equipment => "//ccr:MedicalEquipment/ccr:Equipment",
+        :allergies         => "//ccr:Alerts/ccr:Alert",           # special handling for Description
+        :vital_signs       => "//ccr:VitalSigns/ccr:Result",      # special handling for ./Test/Description
+        :results           => "//ccr:Results/ccr:Result",         # special handling for ./test...same as for vital_signs
+        :medications       => "//ccr:Medications/ccr:Medication", # special handling for productName, brandName
+        :immunizations     => "//ccr:Immunizations/ccr:Immunization" # special handling for productName, brandName
+      }
     end
 
     def create_ccr_hash(doc)
       # This should be generalized to use Xpath expressions for the different sections
 
-    # These all follow the same pattern
-     process_section(:conditions,        doc)
+      # These all follow the same pattern
+      process_section(:conditions,        doc)
       process_section(:encounters,        doc)
       process_section(:procedures,        doc)
       process_section(:care_goals,        doc)
       process_section(:social_history,    doc)
       process_section(:medical_equipment, doc)
       process_section(:allergies,        doc)
-     # These are special
+      # These are special
       process_vital_signs(:vital_signs,   doc)   # Note that this is special!
       process_vital_signs(:results,       doc)   # Note that this is special!
       process_medications(:medications,   doc)   # Note that this is special!
@@ -206,5 +206,5 @@ if __FILE__ == $0
 
   CCRscan::CCRDir.process(ARGV[0],ARGV[1])
   CCRscan::CCRDir.consolidate
-  
+
 end

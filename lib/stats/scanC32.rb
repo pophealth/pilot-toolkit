@@ -36,29 +36,29 @@ module C32Scan
         @@results << C32Scan::C32File.process(item, summary, mu, nmu)
       end 
     end
-      def self.consolidate
-        overallfp = File.open("#{@@outdir}/overall.summary","w")
-        overallmu = File.open("#{@@outdir}/overall.mu","w")
-        overallnmu = File.open("#{@@outdir}/overall.nmu","w")
-        
-        outpsr = Stats::PatientSummaryReport.new
-        @@results.each do |psr |
-          outpsr.merge(psr)
-        end
-        overallfp.puts JSON.pretty_generate(outpsr.summary)
-        overallnmu.puts JSON.pretty_generate(outpsr.unique_non_mu_entries)
-        overallmu.puts JSON.pretty_generate(outpsr.unique_mu_entries)
-        outpsr.dump
-        
+    def self.consolidate
+      overallfp = File.open("#{@@outdir}/overall.summary","w")
+      overallmu = File.open("#{@@outdir}/overall.mu","w")
+      overallnmu = File.open("#{@@outdir}/overall.nmu","w")
+
+      outpsr = Stats::PatientSummaryReport.new
+      @@results.each do |psr |
+        outpsr.merge(psr)
       end
+      overallfp.puts JSON.pretty_generate(outpsr.summary)
+      overallnmu.puts JSON.pretty_generate(outpsr.unique_non_mu_entries)
+      overallmu.puts JSON.pretty_generate(outpsr.unique_mu_entries)
+      outpsr.dump
 
     end
-  end
 
-  # if launched as a standalone program, not loaded as a module
-  if __FILE__ == $0
-
-    C32Scan::C32Dir.process(ARGV[0],ARGV[1])
-    C32Scan::C32Dir.consolidate
-    
   end
+end
+
+# if launched as a standalone program, not loaded as a module
+if __FILE__ == $0
+
+  C32Scan::C32Dir.process(ARGV[0],ARGV[1])
+  C32Scan::C32Dir.consolidate
+
+end
