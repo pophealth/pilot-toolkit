@@ -35,6 +35,7 @@ module C32Preprocessor
     end
   end
 
+
   class PatchCodesSection
     # Initialize a PatchCodesSection
     # @param [Nokogiri::Doc] parsed xml document
@@ -81,6 +82,7 @@ module C32Preprocessor
                         :code => code)
       end
     end
+
 
     # Add code translations to coded blocks
     # @param [Nokogiri::Node]   the code element to be inspected and modified
@@ -143,7 +145,7 @@ module C32Preprocessor
 end
 
 # if launched as a standalone program, not loaded as a module
-if __FILE__ == $0
+if __FILE__ == $0 
   require 'nokogiri'
   require 'json'
   require 'qme/importer/code_system_helper'
@@ -151,6 +153,7 @@ if __FILE__ == $0
     STDERR.puts "jruby c32_preprocessor.rb <indir> <outdir> map.json"
     exit
   end
+
 
   indir = ARGV[0]
   outdir = ARGV[1]

@@ -32,18 +32,19 @@ module Stats
     def add_section(section, pss)
       @sections[section] = pss
       self.class.class_eval do
-       define_method(section){ @sections[section] }
+        define_method(section){ @sections[section] }
       end
     end
 
-   # from_c32:  read a Nokogiri::Document, and leverage the QME patient importer to 
-   # create a hash of entries broken down by section.  Pass these through the 
-   # PatientSummarySection analysis
-   # @param [Nokogiri::Document]   source document
-   def self.from_c32(document)
+    # from_c32:  read a Nokogiri::Document, and leverage the QME patient importer to 
+    # create a hash of entries broken down by section.  Pass these through the 
+    # PatientSummarySection analysis
+    # @param [Nokogiri::Document]   source document
+    def self.from_c32(document)
       psr = PatientSummaryReport.new
       pi = QME::Importer::PatientImporter.instance
-      patient_entry_hash = pi.create_c32_hash(document)
+      # The false argument on create_c32_hash is *IMPORTANT*.  It means, don't ignore entries that lack codes, etc, which is the default behavior
+      patient_entry_hash = pi.create_c32_hash(document, false)
       patient_entry_hash.each_pair do |section, entry_list|
         pss = PatientSummarySection.new(section, @@mu_code_sets[section])
         entry_list.each do |entry| # transfer the entries
